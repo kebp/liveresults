@@ -3,10 +3,11 @@ $CHARSET = 'utf-8';
 class Emma
 {
 
-	public static $db_server = "127.0.0.1";
-	public static $db_database = "liveresultat";
-	public static $db_user = "liveresultat";
-	public static $db_pw= "web";
+	//public static $db_server = "liveresults.cvdrzxhnuzid.eu-west-2.rds.amazonaws.com";
+	public static $db_server = "localhost";
+	public static $db_database = "liveresults";
+	public static $db_user = "liveresults";
+	public static $db_pw= "w00dh0u2e";
 	public static $MYSQL_CHARSET = "utf8";
 	var $m_CompId;
 
@@ -14,6 +15,7 @@ class Emma
 
    var $m_CompDate;
    var $m_TimeDiff = 0;
+   var $m_Tenths = 0;
    var $m_IsMultiDayEvent = false;
    var $m_MultiDayStage = -1;
    var $m_MultiDayParent = -1;
@@ -120,16 +122,20 @@ public static function DelRadioControl($compid,$code,$classname)
 
 
 
-	public static function CreateCompetition($name,$org,$date)
+	public static function CreateCompetition($name,$org,$date,$tenths)
         {
         $conn = self::openConnection();
 	 $res = mysqli_query($conn, "select max(tavid)+1 from login");
 	 list($id) = mysqli_fetch_row($res);
 	if ($id < 10000)
 		$id = 10000;
+        if (isset($tenths))
+          $tenthValue = 1;
+        else
+          $tenthValue = 0;
 
 
-	 mysqli_query($conn, "insert into login(tavid,user,pass,compName,organizer,compDate,public) values(".$id.",'".md5($name.$org.$date)."','".md5("liveresultat")."','".$name."','".$org."','".$date."',0)") or die(mysqli_error($conn));
+	 mysqli_query($conn, "insert into login(tavid,user,pass,compName,organizer,compDate,public,tenths) values(".$id.",'".md5($name.$org.$date)."','".md5("liveresultat")."','".$name."','".$org."','".$date."',0,'".$tenthValue."')") or die(mysqli_error($conn));
 
 	}
 
@@ -158,11 +164,11 @@ public static function DelRadioControl($compid,$code,$classname)
 
 	}
 
-public static function UpdateCompetition($id,$name,$org,$date,$public,$timediff)
+public static function UpdateCompetition($id,$name,$org,$date,$tenths,$public,$timediff)
 
         {
         $conn = self::openConnection();
-	 $sql = "update login set compName = '$name', organizer='$org', compDate ='$date',timediff=$timediff, public=". (!isset($public) ? "0":"1") ." where tavid=$id";
+	 $sql = "update login set compName = '$name', organizer='$org', compDate ='$date',timediff=$timediff, tenths=" . (!isset($tenths) ? "0" : "1") .", public=". (!isset($public) ? "0":"1") ." where tavid=$id";
 
 	 mysqli_query($conn, $sql) or die(mysqli_error($conn));
 
@@ -196,7 +202,7 @@ public static function UpdateCompetition($id,$name,$org,$date,$public,$timediff)
         {
         $conn = self::openConnection();
 
-	 $result = mysqli_query($conn, "select compName, compDate,tavid,organizer,public,timediff, timezone, videourl, videotype,multidaystage,multidayparent from login where tavid=$compid");
+	 $result = mysqli_query($conn, "select compName, compDate,tavid,organizer,public,tenths,timediff, timezone, videourl, videotype,multidaystage,multidayparent from login where tavid=$compid");
 
          $ret = null;
 
@@ -237,6 +243,8 @@ public static function UpdateCompetition($id,$name,$org,$date,$public,$timediff)
 
 		    $this->m_TimeDiff = $tmp["timediff"]*3600;
 
+                    $this->m_Tenths = $tmp['tenths'];
+
 		    if (isset($tmp["videourl"]))
 		    	$this->m_VideoUrl = $tmp["videourl"];
 
@@ -264,6 +272,11 @@ public static function UpdateCompetition($id,$name,$org,$date,$public,$timediff)
 	{
 		return $this->m_IsMultiDayEvent;
 	}
+
+        function IsTenths()
+        {
+                return $this->m_Tenths;
+        }
   
   function HasVideo()
 	{
@@ -484,7 +497,7 @@ function getAllSplitControls()
 			$ret = Array();
 
 
-			$q = "SELECT runners.Name, runners.Club, results.Time, runners.Class ,results.Status, results.Changed, results.DbID, results.Control ";
+			$q = "SELECT runners.Name, runners.Club, runners.bib, results.Time, runners.Class ,results.Status, results.Changed, results.DbID, results.Control ";
 			$q .= ", (select count(*)+1 from results sr, runners sru where sr.tavid=sru.tavid and sr.dbid=sru.dbid and sr.tavid=results.TavId and sru.class = runners.class and sr.status = 0 and sr.time < results.time and sr.Control=1000) as place ";
 			$q .= ", results.Time - (select min(time) from results sr, runners sru where sr.tavid=sru.tavid and sr.dbid=sru.dbid and sr.tavid=results.TavId and sru.class = runners.class and sr.status = 0 and sr.Control=1000) as timeplus ";
 			$q .= "From runners,results where ";
@@ -503,7 +516,11 @@ function getAllSplitControls()
 
 						$ret[$dbId] = Array();
 						$ret[$dbId]["DbId"] = $dbId;
-						$ret[$dbId]["Name"] = $row['Name'];
+                                                if (is_null($row['bib'])) {
+						  $ret[$dbId]["Name"] = $row['Name'];
+                                                } else {
+                                                  $ret[$dbId]["Name"] = $row['Name'] . ' (' . $row['bib'] . ')';
+                                                }
 						$ret[$dbId]["Club"] = $row['Club'];
 						$ret[$dbId]["Class"] = $row['Class'];
 						$ret[$dbId]["Time"] = "";
@@ -548,7 +565,7 @@ function getAllSplitControls()
 			$ret = Array();
 
 
-			$q = "SELECT runners.Name, runners.Club, results.Time ,results.Status, results.Changed, results.DbID, results.Control From runners,results where results.DbID = runners.DbId AND results.TavId = ". $this->m_CompId ." AND runners.TavId = ".$this->m_CompId ." AND runners.Class = '". mysqli_real_escape_string($this->m_Conn, $className)."'  ORDER BY results.Dbid";
+			$q = "SELECT runners.Name, runners.bib, runners.Club, results.Time ,results.Status, results.Changed, results.DbID, results.Control, results.finalPosition From runners,results where results.DbID = runners.DbId AND results.TavId = ". $this->m_CompId ." AND runners.TavId = ".$this->m_CompId ." AND runners.Class = '". mysqli_real_escape_string($this->m_Conn, $className)."'  ORDER BY results.Dbid";
 
 			if ($result = mysqli_query($this->m_Conn, $q))
 
@@ -563,11 +580,16 @@ function getAllSplitControls()
 					{
 						$ret[$dbId] = Array();
 						$ret[$dbId]["DbId"] = $dbId;
-						$ret[$dbId]["Name"] = $row['Name'];
+                                                if (is_null($row['bib'])) {
+						  $ret[$dbId]["Name"] = $row['Name'];
+                                                } else {
+                                                  $ret[$dbId]["Name"] = $row['Name'] . ' (' . $row['bib'] . ')';
+                                                }
 						$ret[$dbId]["Club"] = $row['Club'];
 						$ret[$dbId]["Time"] = "";
 						$ret[$dbId]["Status"] = "9";
-						$ret[$dbId]["Changed"] = "";
+                                                $ret[$dbId]["Changed"] = "";
+                                                $ret[$dbId]["FinalPos"] = $row['finalPosition'];
 					}
 
 					$split = $row['Control'];
@@ -603,11 +625,21 @@ function getAllSplitControls()
 
 				function timeSorter($a,$b)
 					{
-						if ($a['Status'] != $b['Status'])
-							return $a['Status'] - $b['Status'];
-						else
-							return $a['Time'] - $b['Time'];
-					}
+                                          if ($a['Status'] != $b['Status'])
+                                          {
+                                            return $a['Status'] - $b['Status'];
+                                          }
+                                          // At least one has a final position
+                                          elseif ($a['FinalPos'] > 0 || $b['FinalPos'] > 0)
+                                          {
+                                              return $b['FinalPos'] - $a['FinalPos'];
+                                          }
+                                          // Neither has a position
+					  else
+                                          {
+					    return $a['Time'] - $b['Time'];
+					  }
+                                        }
 
 			usort($ret,'timeSorter');
 			return $ret;

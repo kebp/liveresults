@@ -1,13 +1,12 @@
-﻿<?php
-date_default_timezone_set("Europe/Stockholm");
+<?php
+date_default_timezone_set("Europe/London");
 
-include_once("./templates/emmalang_sv.php");
-	include_once("./templates/classEmma.class.php");
-   $lang = "sv";
-   if (isset($_GET['lang']) && $_GET['lang'] != "")
-   {
-	$lang = $_GET['lang'];
-   }
+include_once("./templates/emmalang_en.php");
+include_once("./templates/classEmma.class.php");
+$lang = "en";
+if (isset($_GET['lang']) && $_GET['lang'] != "") {
+    $lang = $_GET['lang'];
+}
 include_once("./templates/emmalang_$lang.php");
 
 header('Content-Type: text/html; charset='.$CHARSET);
@@ -28,7 +27,10 @@ echo("<?xml version=\"1.0\" encoding=\"$CHARSET\" ?>\n");
 <link rel="stylesheet" type="text/css" href="css/style-eoc.css">
 <link rel="stylesheet" type="text/css" href="css/ui-darkness/jquery-ui-1.8.19.custom.css">
 <link rel="stylesheet" type="text/css" href="css/jquery.dataTables_themeroller-eoc.css">
-<script language="javascript" type="text/javascript" src="js/jquery-1.7.2.min.js"></script>
+<script
+  src="https://code.jquery.com/jquery-1.7.2.min.js"
+  integrity="sha256-R7aNzoy2gFrVs+pNJ6+SokH04ppcEqJ0yFLkNGoFALQ="
+  crossorigin="anonymous"></script>
 <script language="javascript" type="text/javascript" src="js/jquery.dataTables.min.js"></script>
 
 <script language="javascript" type="text/javascript">
@@ -73,11 +75,8 @@ el.style.backgroundColor = "";
     <td class="submenu" colspan="2">
        <table border="0" cellpadding="0" cellspacing="1" style="font-size: 14px">
              <tr>
+               <td><a href="https://www.woc2024.org"><img src='images/logo.svg' alt="WOC 2024 logo" width="70px" height="30px"/></a></td>
                <td><a href="index.php"><?=$_CHOOSECMP?></a></td>
-               <td>|</td>
-               <td><a href="https://liveresults.github.io/documentation/" target="_blank"><?=$_FORORGANIZERS?></a></td>
-               <td>|</td>
-               <td><a href="https://liveresults.github.io/documentation/#developer" target="_blank"><?=$_FORDEVELOPERS?></a></td>
              </tr>
        </table>
      </td>
@@ -88,8 +87,8 @@ el.style.backgroundColor = "";
        <table border="0" cellpadding="0" cellspacing="0" width="800">
              <tr>
                <td>
-                      | <?php echo($lang == "sv" ? "<img src='images/se.png' border='0' alt='Svenska'> Svenska" : "<a href=\"?lang=sv\" style='text-decoration: none'><img src='images/se.png' border='0' alt='Svenska'> Svenska</a>")?>
-			   	   			| <?php echo($lang == "en" ? "<img src='images/en.png' border='0' alt='English'> English" : "<a href=\"?lang=en\" style='text-decoration: none'><img src='images/en.png' border='0' alt='English'> English</a>")?>
+			| <?php echo($lang == "en" ? "<img src='images/en.png' border='0' alt='English'> English" : "<a href=\"?lang=en\" style='text-decoration: none'><img src='images/en.png' border='0' alt='English'> English</a>")?>
+                        | <?php echo($lang == "sv" ? "<img src='images/se.png' border='0' alt='Svenska'> Svenska" : "<a href=\"?lang=sv\" style='text-decoration: none'><img src='images/se.png' border='0' alt='Svenska'> Svenska</a>")?>
 			| <?php echo($lang == "fi" ? "<img src='images/fi.png' border='0' alt='Suomeksi'> Suomeksi" : "<a href=\"?lang=fi\" style='text-decoration: none'><img src='images/fi.png' border='0' alt='Suomeksi'> Suomeksi</a>")?>
 			| <?php echo($lang == "ru" ? "<img src='images/ru.png' border='0' alt='Русский'> Русский" : "<a href=\"?lang=ru\" style='text-decoration: none'><img src='images/ru.png' border='0' alt='Русский'> Русский</a>")?>
 			| <?php echo($lang == "cz" ? "<img src='images/cz.png' border='0' alt='Česky'> Česky" : "<a href=\"?lang=cz\" style='text-decoration: none'><img src='images/cz.png' border='0' alt='Česky'> Česky</a>")?>
@@ -109,17 +108,16 @@ el.style.backgroundColor = "";
 			<table border="0" cellpadding="0" cellspacing="0" width="100%" id="tblLiveComps">
 			<tr><th align="left"><?= $_DATE?></th><th align="left"><?= $_EVENTNAME?></th><th align="left"><?= $_ORGANIZER?></th></tr>
 <?php
-	$comps = Emma::GetCompetitionsToday();
-	  foreach ($comps as $comp)
-        {
-        ?>
-                <tr id="row<?=$comp["tavid"]?>" style="font-size:12px;font-weight:bold;"><td><?=date("Y-m-d",strtotime($comp['compDate']))?></td>
+    $comps = Emma::GetCompetitionsToday();
+foreach ($comps as $comp) {
+    ?>
+                <tr id="row<?=$comp["tavid"]?>" style="font-size:12px;font-weight:bold;"><td><?=date("Y-m-d", strtotime($comp['compDate']))?></td>
                 <td><a onmouseover="colorRow('row<?=$comp["tavid"]?>')" onmouseout="resetRow('row<?=$comp["tavid"]?>')" href="followfull.php?comp=<?=$comp['tavid']?>&amp;lang=<?=$lang?>"><?=$comp["compName"]?></a></td>
                 <td style="font-weight:normal"><?=$comp["organizer"]?></td>
                 </tr>
         <?php
-        }
-        ?>
+}
+?>
                         </table>
 
 
@@ -127,17 +125,16 @@ el.style.backgroundColor = "";
 			<table border="0" cellpadding="0" cellspacing="0" width="100%" id="tblComps">
 			<tr><th align="left"><?= $_DATE?></th><th align="left"><?= $_EVENTNAME?></th><th align="left"><?= $_ORGANIZER?></th></tr>
 <?php
-	$comps = Emma::GetCompetitions();
-	foreach ($comps as $comp)
-	{
-	?>
-		<tr id="row<?=$comp["tavid"]?>"><td><?=date("Y-m-d",strtotime($comp['compDate']))?></td>
+    $comps = Emma::GetCompetitions();
+foreach ($comps as $comp) {
+    ?>
+		<tr id="row<?=$comp["tavid"]?>"><td><?=date("Y-m-d", strtotime($comp['compDate']))?></td>
 		<td><a onmouseover="colorRow('row<?=$comp["tavid"]?>')" onmouseout="resetRow('row<?=$comp["tavid"]?>')" href="followfull.php?comp=<?=$comp["tavid"]?>&amp;lang=<?=$lang?>"><?=$comp["compName"]?></a></td>
 		<td><?=$comp["organizer"]?></td>
 		</tr>
 	<?php
-	}
-	?>
+}
+?>
 			</table>
 		</td>
 	     </tr>

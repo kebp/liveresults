@@ -3,7 +3,7 @@ include_once("../templates/classEmma.class.php");
 
 if (isset($_POST['btnSave']))
 {
-	Emma::UpdateCompetition($_GET['compid'],$_POST['name'],$_POST['org'],$_POST['date'],$_POST['public'],$_POST['timediff']);
+	Emma::UpdateCompetition($_GET['compid'],$_POST['name'],$_POST['org'],$_POST['date'],$_POST['tenths'],$_POST['public'],$_POST['timediff']);
 }
 else if (isset($_POST['btnAdd']))
 {
@@ -19,7 +19,7 @@ else if (isset($_GET['what']) && $_GET['what'] == "delallctr")
 }
 
 
-include_once("../templates/emmalang_sv.php");
+include_once("../templates/emmalang_en.php");
 
    $lang = "en";
 
@@ -201,11 +201,13 @@ function confirmDelete(msg,url)
 <input type="text" name="org" size="35" value="<?=$comp['organizer']?>"/><br/>
 <b>Date (format yyyy-mm-dd)</b><br/>
 <input type="text" name="date" size="35" value="<?=date("Y-m-d",strtotime($comp['compDate']))?>"/> (ex. 2008-02-03)<br/>
-<b>Timezonediff (hours, +1 for finland, 0 for Sweden and -1 for GBR)</b><br/>
+<b>Timezonediff (hours, 0 for GMT, +1 for BST or CET and +2 for CEST)</b><br/>
 <input type="text" name="timediff" size="10" value="<?=$comp['timediff']?>"/><br/>
 
-<b>Public</b><br/>
-<input type="checkbox" name="public" <?= $comp['public'] == 1 ? "checked" : "" ?>/><br/><br/>
+<b>Public</b>
+<input type="checkbox" name="public" <?= $comp['public'] == 1 ? "checked" : "" ?>/><br/>
+<b>Show tenths second</b>
+<input type="checkbox" name="tenths" <?= $comp['tenths'] == 1 ? "checked" : "" ?>/><br/><br/>
 <input type="submit" name="btnSave" value="Save"/>
 </form>
 <h1 class="categoriesheader">Radio Controls</h1>

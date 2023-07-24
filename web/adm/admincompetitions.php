@@ -1,6 +1,7 @@
-<?php include_once("../templates/emmalang_sv.php");
+<?php
 
-	include_once("../templates/classEmma.class.php");
+include_once("../templates/emmalang_en.php");
+include_once("../templates/classEmma.class.php");
 
    $lang = "en";
 

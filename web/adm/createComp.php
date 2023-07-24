@@ -3,13 +3,13 @@ include_once("../templates/classEmma.class.php");
 
 if (isset($_POST['btnSubmit']))
 {
-	Emma::CreateCompetition($_POST['name'],$_POST['org'],$_POST['date']);
+	Emma::CreateCompetition($_POST['name'],$_POST['org'],$_POST['date'],$_POST['tenths']);
 	header("Location: admincompetitions.php");
 	exit;
 }
 
 
-include_once("../templates/emmalang_sv.php");
+include_once("../templates/emmalang_en.php");
 
    $lang = "en";
 
@@ -151,6 +151,8 @@ el.style.backgroundColor = "";
 <input type="text" name="org" size="15"/><br/>
 <b>Date (format yyyy-mm-dd)</b><br/>
 <input type="text" name="date" size="15"/> (ex. 2008-02-03)<br/>
+<b>Show tenths second</b>
+<input type="checkbox" name="tenths" size="15"/><br/>
 <input type="submit" name="btnSubmit" value="Create"/>
 </form>
 
