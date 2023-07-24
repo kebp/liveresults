@@ -5,9 +5,9 @@
 
     export class AjaxViewer {
         // ReSharper disable once InconsistentNaming
-        public static VERSION : string = "2016-08-06-01";
+        public static VERSION : string = "2023-06-02";
         private updateAutomatically: boolean = true;
-        private updateInterval: number = 15000;
+        private updateInterval: number = 3000;
         private classUpdateInterval: number = 60000;
 
         private classUpdateTimer : any = null;
@@ -732,9 +732,10 @@
                 sortStatusB = 0;
             if (sortStatusA != sortStatusB)
                 return sortStatusA - sortStatusB;
-
-            if (a.progress == 100 && b.progress == 100)
-                return a.result - b.result;
+ 
+  
+            if (a.FinalPos > 0 || b.FinalPos > 0)
+                return b.FinalPos - a.FinalPos;
 
             if (a.progress == 0 && b.progress == 0) {
                 if (a.start && !b.start)
