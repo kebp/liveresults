@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 
+//  K.Roberts   KR  May 2023    Modified to support position in results for WOC2024. 
+
 namespace LiveResults.Model
 {
     public delegate void ResultDelegate(Result newResult);
@@ -13,6 +15,7 @@ namespace LiveResults.Model
         public string Class { get; set; }
         public int StartTime { get; set; }
         public int Time { get; set; }
+        public int Position { get; set; }
         public int Status { get; set; }
 
         public string bib { get; set; }

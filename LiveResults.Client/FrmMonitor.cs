@@ -6,6 +6,9 @@ using System.Windows.Forms;
 #if _CASPARCG_
 using LiveResults.CasparClient;
 #endif
+
+//  K.Roberts   KR  May 2023    Modified to support position in results for WOC2024. 
+
 namespace LiveResults.Client
 {
     public partial class FrmMonitor : Form
@@ -29,7 +32,7 @@ namespace LiveResults.Client
             get { return m_CompetitionID; }
             set { m_CompetitionID = value; }
         }
-	
+
 
         public void SetParser(IExternalSystemResultParser parser)
         {
@@ -50,7 +53,7 @@ namespace LiveResults.Client
             foreach (EmmaMysqlClient client in m_Clients)
             {
                 if (!client.IsRunnerAdded(newResult.ID))
-                    client.AddRunner(new Runner(newResult.ID, newResult.RunnerName, newResult.RunnerClub, newResult.Class,null,newResult.bib));
+                    client.AddRunner(new Runner(newResult.ID, newResult.RunnerName, newResult.RunnerClub, newResult.Class, null, newResult.bib));
                 else
                     client.UpdateRunnerInfo(newResult.ID, newResult.RunnerName, newResult.RunnerClub, newResult.Class, null, newResult.bib);
 
@@ -60,7 +63,7 @@ namespace LiveResults.Client
 
                 if (newResult.Time != -2)
                 {
-                    client.SetRunnerResult(newResult.ID, newResult.Time, newResult.Status);
+                    client.SetRunnerResult(newResult.ID, newResult.Time, newResult.Status, newResult.Position);     // KR: added position
                 }
 
                 if (newResult.SplitTimes != null)

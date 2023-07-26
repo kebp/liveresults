@@ -1,10 +1,15 @@
 ﻿using LiveResults.Model;
+using Microsoft.VisualBasic.FileIO;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Text;
+using System.IO;
 using System.Xml;
+
+//  K.Roberts   KR  May 2023    Modified to support position in results for WOC2024. 
+//  K.Roberts   KR  May 2023    Added split time controls name definition embedded in comment. 
+//  K.Roberts   KR  Jul 2023    Parsed <Nationality> into club and parsed <BibNumber> into bib
+//                              N.B. Only added for when parsing results; TODO for parsing start lists 
 
 namespace LiveResults.Client.Parsers
 {
@@ -22,10 +27,10 @@ namespace LiveResults.Client.Parsers
             #region parseStartlist
             foreach (XmlNode classStartNode in xmlDoc.GetElementsByTagName("ClassStart"))
             {
-                XmlNode classNode = classStartNode.SelectSingleNode("iof:Class",nsMgr);
+                XmlNode classNode = classStartNode.SelectSingleNode("iof:Class", nsMgr);
                 if (classNode == null)
                     continue;
-                XmlNode classNameNode = classNode.SelectSingleNode("iof:Name",nsMgr);
+                XmlNode classNameNode = classNode.SelectSingleNode("iof:Name", nsMgr);
                 if (classNameNode == null)
                     continue;
 
@@ -67,7 +72,7 @@ namespace LiveResults.Client.Parsers
                                     }
                                     else
                                     {
-                                        runner.SetResult(-9, 9);
+                                        runner.SetResult(-9, 9, 0);             // KR: add position
                                     }
 
                                     runners.Add(runner);
@@ -78,7 +83,7 @@ namespace LiveResults.Client.Parsers
                 }
 
                 /*Individual*/
-                var personNodes = classStartNode.SelectNodes("iof:PersonStart",nsMgr);
+                var personNodes = classStartNode.SelectNodes("iof:PersonStart", nsMgr);
                 if (personNodes != null)
                 {
                     foreach (XmlNode personNode in personNodes)
@@ -86,11 +91,11 @@ namespace LiveResults.Client.Parsers
                         string familyname;
                         string givenname;
                         string club;
-                        if (!ParseNameClubAndId(personNode, nsMgr, out familyname, out givenname, out club)) 
+                        if (!ParseNameClubAndId(personNode, nsMgr, out familyname, out givenname, out club))
                             continue;
 
-                        var startTimeNode = personNode.SelectSingleNode("iof:Start/iof:StartTime",nsMgr);
-                       
+                        var startTimeNode = personNode.SelectSingleNode("iof:Start/iof:StartTime", nsMgr);
+
 
                         if (startTimeNode == null)
                             continue;
@@ -111,11 +116,11 @@ namespace LiveResults.Client.Parsers
             #endregion
             foreach (XmlNode classResultNode in xmlDoc.GetElementsByTagName("ClassResult"))
             {
-                XmlNode classNode = classResultNode.SelectSingleNode("iof:Class",nsMgr);
+                XmlNode classNode = classResultNode.SelectSingleNode("iof:Class", nsMgr);
                 if (classNode == null)
                     continue;
 
-                 XmlNode classNameNode = classNode.SelectSingleNode("iof:Name",nsMgr);
+                XmlNode classNameNode = classNode.SelectSingleNode("iof:Name", nsMgr);
                 if (classNameNode == null)
                     continue;
 
@@ -160,11 +165,16 @@ namespace LiveResults.Client.Parsers
                                 {
                                     string leg = legNode.InnerText;
 
-                                    var runner = new Runner(-1, name, teamName, className + "-" + leg);
+                                    string bib = null;                                                                          // KR
+                                    var bibNumberNode = teamMemberResult.SelectSingleNode("iof:Result/iof:BibNumber", nsMgr);   // KR
+                                    if (bibNumberNode != null) bib = bibNumberNode.InnerText;                                   // KR
+
+                                    var runner = new Runner(-1, name, teamName, className + "-" + leg, bib: bib);               // KR - added bib
 
                                     var competitorStatusNode = teamMemberResult.SelectSingleNode("iof:Result/iof:OverallResult/iof:Status", nsMgr);
                                     var resultTimeNode = teamMemberResult.SelectSingleNode("iof:Result/iof:OverallResult/iof:Time", nsMgr);
                                     var startTimeNode = teamMemberResult.SelectSingleNode("iof:Result/iof:StartTime", nsMgr);
+                                    var positionNode = teamMemberResult.SelectSingleNode("iof:Result/iof:OverallResult/iof:Position", nsMgr);   // KR: add position
 
                                     string status = "notActivated";
                                     if (competitorStatusNode != null)
@@ -177,7 +187,7 @@ namespace LiveResults.Client.Parsers
                                     }
 
                                     string time;
-                                    ParseResult(runner, resultTimeNode, startTimeNode, status, out time);
+                                    ParseResult(runner, resultTimeNode, startTimeNode, positionNode, status, out time);     // KR: add position
 
                                     XmlNodeList splittimes = teamMemberResult.SelectNodes("iof:Result/iof:SplitTime", nsMgr);
                                     ParseSplitTimes(nsMgr, runner, time, splittimes);
@@ -189,7 +199,7 @@ namespace LiveResults.Client.Parsers
                     }
                 }
 
-                var personNodes = classResultNode.SelectNodes("iof:PersonResult",nsMgr);
+                var personNodes = classResultNode.SelectNodes("iof:PersonResult", nsMgr);
                 if (personNodes != null)
                 {
                     foreach (XmlNode personNode in personNodes)
@@ -199,12 +209,16 @@ namespace LiveResults.Client.Parsers
                         string club;
                         if (!ParseNameClubAndId(personNode, nsMgr, out familyname, out givenname, out club)) continue;
 
+                        string bib = null;                                                                      // KR
+                        var bibNumberNode = personNode.SelectSingleNode("iof:Result/iof:BibNumber", nsMgr);     // KR
+                        if (bibNumberNode != null) bib = bibNumberNode.InnerText;                               // KR
 
-                        var runner = new Runner(-1, givenname + " " + familyname, club, className);
+                        var runner = new Runner(-1, givenname + " " + familyname, club, className, bib: bib);   // KR - added bib 
 
-                        var competitorStatusNode = personNode.SelectSingleNode("iof:Result/iof:Status",nsMgr);
-                        var resultTimeNode = personNode.SelectSingleNode("iof:Result/iof:Time",nsMgr);
-                        var startTimeNode = personNode.SelectSingleNode("iof:Result/iof:StartTime",nsMgr);
+                        var competitorStatusNode = personNode.SelectSingleNode("iof:Result/iof:Status", nsMgr);
+                        var resultTimeNode = personNode.SelectSingleNode("iof:Result/iof:Time", nsMgr);
+                        var startTimeNode = personNode.SelectSingleNode("iof:Result/iof:StartTime", nsMgr);
+                        var positionNode = personNode.SelectSingleNode("iof:Result/iof:Position", nsMgr);   // KR: add position
                         if (competitorStatusNode == null)
                             continue;
 
@@ -217,9 +231,9 @@ namespace LiveResults.Client.Parsers
                         }
 
                         string time;
-                        ParseResult(runner, resultTimeNode, startTimeNode, status, out time);
+                        ParseResult(runner, resultTimeNode, startTimeNode, positionNode, status, out time);     // KR: add position
 
-                        XmlNodeList splittimes = personNode.SelectNodes("iof:Result/iof:SplitTime",nsMgr);
+                        XmlNodeList splittimes = personNode.SelectNodes("iof:Result/iof:SplitTime", nsMgr);
                         ParseSplitTimes(nsMgr, runner, time, splittimes);
 
                         runners.Add(runner);
@@ -254,6 +268,8 @@ namespace LiveResults.Client.Parsers
 
         private static void CheckReadRadioDefinitionFromComment(List<RadioControl> t_radioControls, XmlNode nodeToCheckForComment, string className)
         {
+            // extract split time control codes from a comment of the form: <!-- SplitTimeControls: 34,61,48,40,39,999 -->
+
             if (nodeToCheckForComment.FirstChild is XmlComment)
             {
                 var commentNode = nodeToCheckForComment.FirstChild as XmlComment;
@@ -267,6 +283,7 @@ namespace LiveResults.Client.Parsers
                         {
                             var splitControls = parts[1].Trim().Split(',');
                             Dictionary<int, int> radioCnt = new Dictionary<int, int>();
+                            var splitControlsNames = CheckReadRadioDefinitionFromAdditionalComment(commentNode);            // KR
                             for (int i = 0; i < splitControls.Length; i++)
                             {
                                 if (splitControls[i].Trim() != "999")
@@ -280,7 +297,8 @@ namespace LiveResults.Client.Parsers
                                         Order = i,
                                         ClassName = className,
                                         Code = radioCnt[code] * 1000 + code,
-                                        ControlName = "(" + code + ")"
+                                        ControlName = (i < splitControlsNames.Count && !string.IsNullOrWhiteSpace(splitControlsNames[i])
+                                                        ? splitControlsNames[i] : $"({code})")                              // KR
                                     });
                                 }
                             }
@@ -290,7 +308,36 @@ namespace LiveResults.Client.Parsers
             }
         }
 
-        private static void ParseResult(Runner runner, XmlNode resultTimeNode, XmlNode startTimeNode, string status, out string time)
+        // KR:  added following method to extract split time control names from a second comment 
+        //      of the form: <!-- SplitTimeControlsNames: "TV-1","TV-2","Prewarning","TV-3","Final","Finish" -->
+
+        private static List<string> CheckReadRadioDefinitionFromAdditionalComment(XmlNode commentNode)
+        {
+            var splitControlsNames = new List<string>();
+            var additionalCommentNode = commentNode.NextSibling as XmlComment;
+            if (additionalCommentNode != null)
+            {
+                var additionalComment = additionalCommentNode.InnerText;
+                if (!string.IsNullOrEmpty(additionalComment) && additionalComment.ToLower().IndexOf("splittimecontrolsnames:") >= 0)
+                {
+                    var parts = additionalComment.Split(':');
+                    if (string.Compare(parts[0].Trim(), "splittimecontrolsnames", StringComparison.InvariantCultureIgnoreCase) == 0)
+                    {
+                        using (var csvParser = new TextFieldParser(new StringReader(parts[1].Trim())))
+                        {
+                            csvParser.HasFieldsEnclosedInQuotes = true;
+                            csvParser.SetDelimiters(",");
+                            var fields = csvParser.ReadFields();
+                            csvParser.Close();
+                            foreach (var field in fields) splitControlsNames.Add(field.Trim());
+                        }
+                    }
+                }
+            }
+            return splitControlsNames;
+        }
+
+        private static void ParseResult(Runner runner, XmlNode resultTimeNode, XmlNode startTimeNode, XmlNode positionNode, string status, out string time)     // KR: add position
         {
             int itime;
             int istatus;
@@ -309,6 +356,16 @@ namespace LiveResults.Client.Parsers
                 int istarttime = ParseTime(starttime);
                 runner.SetStartTime(istarttime);
             }
+
+            int iposition = 0;                                  // KR: add position
+            string position = "";                               //
+            if (positionNode != null)                           //
+                position = positionNode.InnerText;              //
+                                                                //
+            if (!string.IsNullOrEmpty(position))                //
+            {                                                   //    
+                _ = int.TryParse(position, out iposition);      //
+            }                                                   //
 
             itime = string.IsNullOrEmpty(time) ? -10 : (int)(Convert.ToDouble(time, CultureInfo.InvariantCulture) * 100);//ParseTime(time);
             istatus = 10;
@@ -340,7 +397,7 @@ namespace LiveResults.Client.Parsers
                     break;
             }
 
-            runner.SetResult(itime, istatus);
+            runner.SetResult(itime, istatus, iposition);            // KR: add position
         }
 
         private static void FixKraemerTimeFormat(ref string time)
@@ -381,7 +438,7 @@ namespace LiveResults.Client.Parsers
                                 {
                                     FixKraemerTimeFormat(ref time);
                                     var itime = (int)(Convert.ToDouble(time, CultureInfo.InvariantCulture) * 100);
-                                    runner.SetResult(itime, 0);
+                                    runner.SetResult(itime, 0, 0);              // KR: add position
                                 }
                             }
                         }
@@ -415,16 +472,16 @@ namespace LiveResults.Client.Parsers
             club = null;
             familyname = null;
             givenname = null;
-           
 
-            XmlNode personNameNode = personResultNode.SelectSingleNode("iof:Person/iof:Name",nsMgr);
+
+            XmlNode personNameNode = personResultNode.SelectSingleNode("iof:Person/iof:Name", nsMgr);
             if (personNameNode == null)
             {
                 return false;
             }
 
-            var familyNameNode = personNameNode.SelectSingleNode("iof:Family",nsMgr);
-            var giveNameNode = personNameNode.SelectSingleNode("iof:Given",nsMgr);
+            var familyNameNode = personNameNode.SelectSingleNode("iof:Family", nsMgr);
+            var giveNameNode = personNameNode.SelectSingleNode("iof:Given", nsMgr);
             if (familyNameNode == null || giveNameNode == null)
             {
                 return false;
@@ -432,13 +489,15 @@ namespace LiveResults.Client.Parsers
 
             familyname = familyNameNode.InnerText;
             givenname = giveNameNode.InnerText;
-           // sourceId = personIdNode.InnerText;
+            // sourceId = personIdNode.InnerText;
 
-            var clubNode = personResultNode.SelectSingleNode("iof:Organisation/iof:ShortName",nsMgr);
+            //var clubNode = personResultNode.SelectSingleNode("iof:Organisation/iof:ShortName",nsMgr); // KR
+            var clubNode = personResultNode.SelectSingleNode("iof:Person/iof:Nationality", nsMgr);      // KR use nationality for club
             club = "";
             if (clubNode != null)
             {
-                club = clubNode.InnerText;
+                //club = clubNode.InnerText;                                                            // KR
+                if (clubNode.Attributes["code"] != null) club = clubNode.Attributes["code"].Value;      // KR                                              // KR
             }
             return true;
         }
@@ -448,7 +507,7 @@ namespace LiveResults.Client.Parsers
             int itime = -9;
             if (!string.IsNullOrEmpty(time))
             {
-                var dttime = DateTime.Parse(time,System.Globalization.CultureInfo.InvariantCulture);
+                var dttime = DateTime.Parse(time, System.Globalization.CultureInfo.InvariantCulture);
                 itime = (int)(dttime.TimeOfDay.TotalMilliseconds / 10);
             }
             return itime;
