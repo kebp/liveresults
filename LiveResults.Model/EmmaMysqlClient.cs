@@ -9,11 +9,13 @@ using System.Text;
 using System.Threading;
 using System.Linq;
 
+//  K.Roberts   KR  May 2023    Modified to support position in results for WOC2024. 
+
 namespace LiveResults.Model
 {
     public delegate void LogMessageDelegate(string msg);
 
-   
+
     public class EmmaMysqlClient : IDisposable
     {
         public delegate void ResultChangedDelegate(Runner runner, int position);
@@ -25,11 +27,11 @@ namespace LiveResults.Model
         }
 
 
-        private static readonly Dictionary<int,Dictionary<string,int>> m_compsSourceToIdMapping = 
-            new Dictionary<int, Dictionary<string, int>>(); 
-        private static readonly Dictionary<int,int> m_compsNextGeneratedId = new Dictionary<int, int>(); 
+        private static readonly Dictionary<int, Dictionary<string, int>> m_compsSourceToIdMapping =
+            new Dictionary<int, Dictionary<string, int>>();
+        private static readonly Dictionary<int, int> m_compsNextGeneratedId = new Dictionary<int, int>();
 
-        private static readonly Dictionary<int,int[]> m_runnerPreviousDaysTotalTime = new Dictionary<int, int[]>();
+        private static readonly Dictionary<int, int[]> m_runnerPreviousDaysTotalTime = new Dictionary<int, int[]>();
 
         public static int GetIdForSourceIdInCompetition(int compId, string sourceId)
         {
@@ -128,7 +130,7 @@ namespace LiveResults.Model
         private MySqlConnection m_connection;
         private readonly string m_connStr;
         private int m_compID;
-        private readonly Dictionary<int,Runner> m_runners;
+        private readonly Dictionary<int, Runner> m_runners;
         private readonly Dictionary<string, RadioControl[]> m_classRadioControls;
         private readonly List<DbItem> m_itemsToUpdate;
         private readonly bool m_assignIDsInternally;
@@ -140,7 +142,7 @@ namespace LiveResults.Model
             m_itemsToUpdate = new List<DbItem>();
             m_assignIDsInternally = assignIDsInternally;
 
-            m_connStr = "Database=" + database + ";Data Source="+server+";User Id="+user+";Password="+pass;
+            m_connStr = "Database=" + database + ";Data Source=" + server + ";User Id=" + user + ";Password=" + pass;
             m_connection = new MySqlConnection(m_connStr);
             m_compID = competitionID;
         }
@@ -172,7 +174,7 @@ namespace LiveResults.Model
                         radios.Add(radioControl.Code, radioControl);
                     }
                 }
-                
+
             }
             return radios.Values.ToArray();
         }
@@ -180,7 +182,7 @@ namespace LiveResults.Model
         public RadioControl[] GetRadioControlsForClass(string className)
         {
             return m_classRadioControls.ContainsKey(className) ? m_classRadioControls[className] : null;
-            
+
         }
 
 
@@ -200,11 +202,11 @@ namespace LiveResults.Model
 
         public string[] GetClasses()
         {
-            Dictionary<string,string> classes = new Dictionary<string, string>();
+            Dictionary<string, string> classes = new Dictionary<string, string>();
             foreach (var r in m_runners)
             {
                 if (!classes.ContainsKey(r.Value.Class))
-                    classes.Add(r.Value.Class,"");
+                    classes.Add(r.Value.Class, "");
             }
 
             return classes.Keys.ToArray();
@@ -267,7 +269,7 @@ namespace LiveResults.Model
                 cmd.CommandText = "select sourceid,id from runneraliases where compid = " + m_compID;
                 reader = cmd.ExecuteReader();
 
-                Dictionary<int,string> idToAliasDictionary = new Dictionary<int, string>();
+                Dictionary<int, string> idToAliasDictionary = new Dictionary<int, string>();
 
                 while (reader.Read())
                 {
@@ -291,15 +293,16 @@ namespace LiveResults.Model
                 }
 
 
-                
 
-                cmd.CommandText = "select runners.dbid,control,time,name,club,class,status,bib from runners, results where results.dbid = runners.dbid and results.tavid = " + m_compID + " and runners.tavid = " + m_compID;
+
+                cmd.CommandText = "select runners.dbid,control,time,finalPosition,name,club,class,status,bib from runners, results where results.dbid = runners.dbid and results.tavid = " + m_compID + " and runners.tavid = " + m_compID;
                 reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
                     var dbid = Convert.ToInt32(reader["dbid"]);
                     var control = Convert.ToInt32(reader["control"]);
                     var time = Convert.ToInt32(reader["time"]);
+                    var position = Convert.ToInt32(reader["finalPosition"]);        // KR: added position
                     var bib = reader["bib"] as string;
                     var sourceId = idToAliasDictionary.ContainsKey(dbid) ? idToAliasDictionary[dbid] : null;
                     if (!IsRunnerAdded(dbid))
@@ -308,10 +311,10 @@ namespace LiveResults.Model
                         AddRunner(r);
                         numRunners++;
                     }
-                switch (control)
+                    switch (control)
                     {
                         case 1000:
-                            SetRunnerResult(dbid, time, Convert.ToInt32(reader["status"]));
+                            SetRunnerResult(dbid, time, Convert.ToInt32(reader["status"]), position);       // KR: added position
                             numResults++;
                             break;
                         case 100:
@@ -323,7 +326,7 @@ namespace LiveResults.Model
                             SetRunnerSplit(dbid, control, time);
                             break;
                     }
-                    
+
                 }
                 reader.Close();
 
@@ -341,9 +344,9 @@ namespace LiveResults.Model
                 m_connection.Close();
                 m_itemsToUpdate.Clear();
                 m_currentlyBuffering = false;
-                FireLogMsg("Done - Buffered " + m_runners.Count + " existing runners and " + numResults +" existing results from server");
+                FireLogMsg("Done - Buffered " + m_runners.Count + " existing runners and " + numResults + " existing results from server");
             }
-            
+
             m_continue = true;
             m_mainTh = new Thread(Run);
             m_mainTh.Name = "Main MYSQL Thread [" + m_connection.DataSource + "]";
@@ -355,7 +358,7 @@ namespace LiveResults.Model
             }
         }
 
-       
+
         public void UpdateRunnerInfo(int id, string name, string club, string Class, string sourceId, string bib)
         {
             if (m_runners.ContainsKey(id))
@@ -416,7 +419,7 @@ namespace LiveResults.Model
             if (!m_runners.ContainsKey(r.ID))
             {
                 m_runners.Add(r.ID, r);
-               
+
                 m_itemsToUpdate.Add(r);
                 if (!m_currentlyBuffering)
                 {
@@ -485,16 +488,16 @@ namespace LiveResults.Model
         /// <param name="runnerID"></param>
         /// <param name="time"></param>
         /// <param name="status"></param>
-        public void SetRunnerResult(int runnerID, int time, int status)
+        public void SetRunnerResult(int runnerID, int time, int status, int position = 0)       // KR: added position
         {
             if (!IsRunnerAdded(runnerID))
                 throw new ApplicationException("Runner is not added! {" + runnerID + "} [SetRunnerResult]");
 
             var r = m_runners[runnerID];
 
-            if (r.HasResultChanged(time, status))
+            if (r.HasResultChanged(time, status, position))
             {
-                r.SetResult(time, status);
+                r.SetResult(time, status, position);
                 m_itemsToUpdate.Add(r);
                 if (!m_currentlyBuffering)
                 {
@@ -556,7 +559,7 @@ namespace LiveResults.Model
                     {
                         if (existingRadios.Length > i)
                         {
-                            if (existingRadios[i].Order != controls[i].Order 
+                            if (existingRadios[i].Order != controls[i].Order
                                 || existingRadios[i].Code != controls[i].Code
                                 || existingRadios[i].ControlName != controls[i].ControlName)
                             {
@@ -639,9 +642,9 @@ namespace LiveResults.Model
                         int instNum = 0;
                         foreach (var existingRunner in existingClass)
                         {
-                            
-                            if (string.Compare(existingRunner.Name,runner.Name, StringComparison.InvariantCultureIgnoreCase) == 0 &&
-                                string.Compare(existingRunner.Club,runner.Club, StringComparison.InvariantCultureIgnoreCase) == 0)
+
+                            if (string.Compare(existingRunner.Name, runner.Name, StringComparison.InvariantCultureIgnoreCase) == 0 &&
+                                string.Compare(existingRunner.Club, runner.Club, StringComparison.InvariantCultureIgnoreCase) == 0)
                             {
                                 instNum++;
                                 if (instNum == findInstance)
@@ -706,7 +709,7 @@ namespace LiveResults.Model
                     foreach (var runner in classGroup)
                     {
                         runner.ID = m_nextInternalId++;
-                        var newRunner = new Runner(runner.ID,runner.Name, runner.Club, runner.Class, runner.SourceId, runner.Bib);
+                        var newRunner = new Runner(runner.ID, runner.Name, runner.Club, runner.Class, runner.SourceId, runner.Bib);
                         AddRunner(newRunner);
                         UpdateRunnerTimes(runner);
                     }
@@ -719,7 +722,7 @@ namespace LiveResults.Model
             if (runner.StartTime >= 0)
                 SetRunnerStartTime(runner.ID, runner.StartTime);
 
-            SetRunnerResult(runner.ID, runner.Time, runner.Status);
+            SetRunnerResult(runner.ID, runner.Time, runner.Status, runner.Position);        // KR: added position
 
             var spl = runner.SplitTimes;
             if (spl != null)
@@ -851,7 +854,7 @@ namespace LiveResults.Model
 
                                         cmd.Parameters.AddWithValue("?id", r.ID);
                                         cmd.CommandText = "REPLACE INTO runners (tavid,name,club,class,brick,dbid,bib) VALUES (?compid,?name,?club,?class,0,?id,?bib)";
-                                       
+
 
                                         try
                                         {
@@ -892,8 +895,9 @@ namespace LiveResults.Model
                                         cmd.Parameters.AddWithValue("?compid", m_compID);
                                         cmd.Parameters.AddWithValue("?id", r.ID);
                                         cmd.Parameters.AddWithValue("?time", r.Time);
+                                        cmd.Parameters.AddWithValue("?finalPosition", r.Position);      // KR: added position
                                         cmd.Parameters.AddWithValue("?status", r.Status);
-                                        cmd.CommandText = "REPLACE INTO results (tavid,dbid,control,time,status,changed) VALUES(?compid,?id,1000,?time,?status,Now())";
+                                        cmd.CommandText = "REPLACE INTO results (tavid,dbid,control,time,finalPosition,status,changed) VALUES(?compid,?id,1000,?time,?finalPosition,?status,Now())";
                                         cmd.ExecuteNonQuery();
                                         cmd.Parameters.Clear();
 
@@ -906,8 +910,9 @@ namespace LiveResults.Model
                                         cmd.Parameters.AddWithValue("?compid", m_compID);
                                         cmd.Parameters.AddWithValue("?id", r.ID);
                                         cmd.Parameters.AddWithValue("?starttime", r.StartTime);
+                                        cmd.Parameters.AddWithValue("?finalPosition", r.Position);      // KR: added position
                                         cmd.Parameters.AddWithValue("?status", r.Status);
-                                        cmd.CommandText = "REPLACE INTO results (tavid,dbid,control,time,status,changed) VALUES(?compid,?id,100,?starttime,?status,Now())";
+                                        cmd.CommandText = "REPLACE INTO results (tavid,dbid,control,time,finalPosition,status,changed) VALUES(?compid,?id,100,?starttime,?finalPosition,?status,Now())";
                                         cmd.ExecuteNonQuery();
                                         cmd.Parameters.Clear();
                                         FireLogMsg("Runner " + r.Name + "s starttime updated in DB");

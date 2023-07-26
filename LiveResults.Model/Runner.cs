@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 
+//  K.Roberts   KR  May 2023    Modified to support position in results for WOC2024. 
+
 namespace LiveResults.Model
 {
     public class RunnerPair
@@ -27,7 +29,7 @@ namespace LiveResults.Model
                     totalStatus = Runner2.Status;
 
                 int time = Math.Max(Runner1.Time, Runner2.Time);
-                
+
 
                 var combinedSplits = new List<ResultStruct>();
                 if (Runner1.SplitTimes != null)
@@ -59,7 +61,7 @@ namespace LiveResults.Model
 
                 var res = new Result
                 {
-                    ID = Math.Min(Runner1.ID,Runner2.ID),
+                    ID = Math.Min(Runner1.ID, Runner2.ID),
                     Class = Runner1.Class,
                     Time = time,
                     RunnerClub = club,
@@ -124,6 +126,7 @@ namespace LiveResults.Model
         private string m_bib;
         private int m_start;
         private int m_time;
+        private int m_position;             // KR: added position
         private int m_status;
         private string m_sourceId;
 
@@ -131,7 +134,7 @@ namespace LiveResults.Model
         public bool ResultUpdated;
         public bool StartTimeUpdated;
 
-        private readonly Dictionary<int,SplitTime> m_splitTimes;
+        private readonly Dictionary<int, SplitTime> m_splitTimes;
         public Runner(int dbID, string name, string club, string Class, string sourceId = null, string bib = null)
         {
             RunnerUpdated = true;
@@ -157,7 +160,7 @@ namespace LiveResults.Model
             {
                 m_sourceId = value;
             }
-        
+
         }
         public int ID
         {
@@ -220,6 +223,14 @@ namespace LiveResults.Model
             get
             {
                 return m_time;
+            }
+        }
+
+        public int Position                 // KR: add position
+        {
+            get
+            {
+                return m_position;
             }
         }
 
@@ -307,16 +318,17 @@ namespace LiveResults.Model
             }
         }
 
-        public bool HasResultChanged(int time, int status)
+        public bool HasResultChanged(int time, int status, int position)        // KR: added position
         {
-            return m_time != time || m_status != status;
+            return m_time != time || m_position != position || m_status != status;
         }
 
-        public void SetResult(int time, int status)
+        public void SetResult(int time, int status, int position = 0)           // KR: added position
         {
-            if (HasResultChanged(time,status))
+            if (HasResultChanged(time, status, position))
             {
                 m_time = time;
+                m_position = position;
                 m_status = status;
                 ResultUpdated = true;
             }

@@ -136,6 +136,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="MySql.Data, Version=6.2.2.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\References\MySql.Data.dll</HintPath>
@@ -372,6 +373,7 @@
     <None Include="Resources\iof_logohead.png" />
     <None Include="Resources\iof_logohead1.png" />
     <None Include="Resources\ssftiming.png" />
+    <Content Include="Resources\LiveResults.ico" />
     <Content Include="Wizard\Wizard.bmp" />
     <Content Include="Wizard\wizBigOnlineFolder.gif" />
   </ItemGroup>
