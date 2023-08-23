@@ -20,7 +20,7 @@ var LiveResults;
             this.runnerStatus = runnerStatus;
             this.showTenthOfSecond = showTenthOfSecond;
             this.updateAutomatically = true;
-            this.updateInterval = 15000;
+            this.updateInterval = 3000;
             this.classUpdateInterval = 60000;
             this.classUpdateTimer = null;
             this.passingsUpdateTimer = null;
@@ -92,17 +92,16 @@ var LiveResults;
             var _this = this;
             if (data != null && data.status == "OK") {
                 if (!data.classes || !$.isArray(data.classes) || data.classes.length == 0) {
-                    $('#resultsHeader').html("<b>" + this.resources["_NOCLASSESYET"] + "</b>");
+                    $('#resultsHeader').html(this.resources["_CHOOSECLASS"]);
                 }
                 if (data.classes != null) {
-                    var str = "<nowrap>";
+                    var str = "";
                     $.each(data.classes, function (key, value) {
                         var param = value.className;
                         if (param && param.length > 0)
                             param = param.replace('\'', '\\\'');
-                        str += "<a href=\"javascript:LiveResults.Instance.chooseClass('" + param + "')\">" + value.className + "</a><br/>";
+                        str += "<li><a class=\"dropdown-item\" href=\"javascript:LiveResults.Instance.chooseClass('" + param + "')\">" + value.className + "</a></li>";
                     });
-                    str += "</nowrap>";
                     $("#" + this.classesDiv).html(str);
                     this.lastClassListHash = data.hash;
                 }
@@ -302,7 +301,7 @@ var LiveResults;
             clearTimeout(this.resUpdateTimeout);
             $('#divResults').html('');
             this.curClassName = className;
-            this.curClubName = null;
+            this.curClubName = "";
             $('#resultsHeader').html(this.resources["_LOADINGRESULTS"]);
             $.ajax({
                 url: "api.php",
@@ -536,7 +535,7 @@ var LiveResults;
         AjaxViewer.prototype.setAutomaticUpdate = function (val) {
             this.updateAutomatically = val;
             if (this.updateAutomatically) {
-                $("#" + this.setAutomaticUpdateText).html("<b>" + this.resources["_AUTOUPDATE"] + ":</b> " + this.resources["_ON"] + " | <a href=\"javascript:LiveResults.Instance.setAutomaticUpdate(false);\">" + this.resources["_OFF"] + "</a>");
+                $("#" + this.setAutomaticUpdateText).html("<a class=\"nav-link active\" aria-current=\"page\" href=\"javascript:LiveResults.Instance.setAutomaticUpdate(false);\">" + this.resources["_AUTOUPDATE"] + "&nbsp<i class=\"fa fa-check-square-o\"></i></a>");
                 this.checkForClassUpdate();
                 this.updateLastPassings();
                 this.checkForClassUpdate();
@@ -545,7 +544,7 @@ var LiveResults;
                 clearTimeout(this.resUpdateTimeout);
                 clearTimeout(this.passingsUpdateTimer);
                 clearTimeout(this.classUpdateTimer);
-                $("#" + this.setAutomaticUpdateText).html("<b>" + this.resources["_AUTOUPDATE"] + ":</b> <a href=\"javascript:LiveResults.Instance.setAutomaticUpdate(true);\">" + this.resources["_ON"] + "</a> | " + this.resources["_OFF"] + "");
+                $("#" + this.setAutomaticUpdateText).html("<a class=\"nav-link active\" aria-current=\"page\" href=\"javascript:LiveResults.Instance.setAutomaticUpdate(true);\">" + this.resources["_AUTOUPDATE"] + "&nbsp<i class=\"fa fa-square-o\"></i></a>");
                 this.serverTimeDiff = null;
                 if (this.currentTable) {
                     $.each(this.currentTable.fnGetNodes(), function (idx, obj) {
@@ -676,8 +675,8 @@ var LiveResults;
                 sortStatusB = 0;
             if (sortStatusA != sortStatusB)
                 return sortStatusA - sortStatusB;
-            if (a.progress == 100 && b.progress == 100)
-                return a.result - b.result;
+            if (a.FinalPos > 0 || b.FinalPos > 0)
+                return b.FinalPos - a.FinalPos;
             if (a.progress == 0 && b.progress == 0) {
                 if (a.start && !b.start)
                     return -1;
@@ -797,7 +796,7 @@ var LiveResults;
             $('#divResults').html('');
             $('#' + this.txtResetSorting).html('');
             this.curClubName = clubName;
-            this.curClassName = null;
+            this.curClassName = "";
             $('#resultsHeader').html(this.resources["_LOADINGRESULTS"]);
             $.ajax({
                 url: "api.php",
@@ -835,7 +834,7 @@ var LiveResults;
                             res.placeSortable = 9999;
                     });
                     var columns = Array();
-                    columns.push({ "sTitle": "#", "aTargets": [0], "mDataProp": "place" });
+                    columns.push({ "sTitle": "#", "aTargets": [0], "mDataProp": "place", });
                     columns.push({ "sTitle": "placeSortable", "bVisible": false, "mDataProp": "placeSortable", "aTargets": [1] });
                     columns.push({ "sTitle": this.resources["_NAME"], "aTargets": [2], "mDataProp": "name" });
                     columns.push({ "sTitle": this.resources["_CLUB"], "bSortable": false, "aTargets": [3], "mDataProp": "club" });
@@ -916,7 +915,7 @@ var LiveResults;
             $("#" + this.txtResetSorting).html("");
         };
         // ReSharper disable once InconsistentNaming
-        AjaxViewer.VERSION = "2016-08-06-01";
+        AjaxViewer.VERSION = "2023-06-02";
         return AjaxViewer;
     }());
     LiveResults.AjaxViewer = AjaxViewer;

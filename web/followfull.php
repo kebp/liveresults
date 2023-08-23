@@ -38,21 +38,24 @@ $showTimePrediction = true;
 
 echo("<?xml version=\"1.0\" encoding=\"$CHARSET\" ?>\n");
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-        "http://www.w3.org/TR/html4/loose.dtd">
-<html>
-<head><title><?=$_TITLE?> :: <?=$currentComp->CompName()?> [<?=$currentComp->CompDate()?>]</title>
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <title><?=$_TITLE?> :: <?=$currentComp->CompName()?> [<?=$currentComp->CompDate()?>]</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
 
 <META HTTP-EQUIV="expires" CONTENT="-1">
 <meta http-equiv="Content-Type" content="text/html;charset=<?=$CHARSET?>">
-
-<meta name="viewport" content="width=1200,initial-scale=1.0">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#555556">
 <link rel="stylesheet" type="text/css" href="css/style-eoc.css">
 <link rel="stylesheet" type="text/css" href="css/ui-darkness/jquery-ui-1.8.19.custom.css">
 <link rel="stylesheet" type="text/css" href="css/jquery.dataTables_themeroller-eoc.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <script type="text/javascript">
 window.mobilecheck = function() {
   var check = false;
@@ -180,204 +183,145 @@ $(document).ready(function()
 });
 
 
-
-function changeFontSize(val)
-{
-	var size = $("td").css("font-size");
-	var newSize = parseInt(size.replace(/px/, "")) + val;
-	$("td").css("font-size",newSize + "px");
-}
-
 </script>
 </head>
 <body>
 
 <!-- MAIN DIV -->
 
+<?php if (!$isSingleClass && !$isSingleClub && $showPath) {?>
+<nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #0f2170;">
+  <div class="container-fluid">
+  <a class="navbar-brand" href="https://www.woc2024.org">
+    <img src="images/logo.svg" alt="WOC2024 logo" width="70px" height="30px" class="d-inline-block align-text-top">
+  </a>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="index.php">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="dok/help.php?lang=<?=$lang?>" target="_blank"><?=$_INSTRUCTIONSHELP?></a>
+        </li>
+        <li class="nav-item">
+          <span id="setAutomaticUpdateText">
+            <a class="nav-link active" aria-current="page" href="javascript:LiveResults.Instance.setAutomaticUpdate(false);"><?=$_AUTOUPDATE?>&nbsp<i class="fa fa-check-square-o" aria-hidden="true"></i></a>
+          </span>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <?php if ($lang == "en") {echo "<img src='images/en.png' alt='English'>";}
+            elseif ($lang == "sv") {echo "<img src='images/se.png' alt='Svenska'>";}
+            elseif ($lang == "fi") {echo "<img src='images/fi.png' alt='Suomeksi'>";}
+            elseif ($lang == "ru") {echo "<img src='images/ru.png' alt='Русский'>";}
+            elseif ($lang == "cz") {echo "<img src='images/cz.png' alt='Česky'>";}
+            elseif ($lang == "de") {echo "<img src='images/de.png' alt='Deutsch'>";}
+            elseif ($lang == "bg") {echo "<img src='images/bg.png' alt='български'>";}
+            elseif ($lang == "fr") {echo "<img src='images/fr.png' alt='Français'>";}
+            elseif ($lang == "it") {echo "<img src='images/it.png' border='0' alt='Italiano'>";}
+            elseif ($lang == "hu") {echo "<img src='images/hu.png' border='0' alt='Magyar'>";}
+            elseif ($lang == "es") {echo "<img src='images/es.png' border='0' alt='Español'>";}
+            elseif ($lang == "pl") {echo "<img src='images/pl.png' border='0' alt='Polska'>";}
+            else {echo "<img src='images/pt.png?a' border='0' alt='Português'>";}
+            ?>
+          </a>
+        <ul class="dropdown-menu">
+          <li><?php echo($lang == "en" ? "<img src='images/en.png' alt='English'> English <i class='fa fa-check'></i>" :
+"<a href=\"?lang=en&amp;comp=".$_GET['comp']."\" style='text-decoration: none'><img src='images/en.png' alt='English'> English</a>")?>
+          </li>
+          <li><?php echo($lang == "sv" ? "<img src='images/se.png' alt='Svenska'> Svenska <i class='fa fa-check' style='color:green;'></i>" :
+"<a href=\"?lang=sv&amp;comp=".$_GET['comp']."\" style='text-decoration: none'><img src='images/se.png' alt='Svenska'> Svenska</a>")?>
+          </li>
+          <li><?php echo($lang == "fi" ? "<img src='images/fi.png' alt='Suomeksi'> Suomeksi <i class='fa fa-check' style='color:green;'></i>" :
+"<a href=\"?lang=fi&amp;comp=".$_GET['comp']."\" style='text-decoration: none'><img src='images/fi.png'  alt='Suomeksi'> Suomeksi</a>")?>
+          </li>
+          <li> <?php echo($lang == "ru" ? "<img src='images/ru.png' alt='Русский'> Русский <i class='fa fa-check' style='color:green;'></i>" :
+"<a href=\"?lang=ru&amp;comp=".$_GET['comp']."\" style='text-decoration: none'><img src='images/ru.png' alt='Русский'> Русский</a>")?>
+          </li>
+          <li><?php echo($lang == "cz" ? "<img src='images/cz.png' alt='Česky'> Česky <i class='fa fa-check' style='color:green;'></i>" :
+"<a href=\"?lang=cz&amp;comp=".$_GET['comp']."\" style='text-decoration: none'><img src='images/cz.png' alt='Česky'> Česky</a>")?>
+          </li>
+          <li> <?php echo($lang == "de" ? "<img src='images/de.png' alt='Deutsch'> Deutsch <i class='fa fa-check' style='color:green;'></i>" :
+"<a href=\"?lang=de&amp;comp=".$_GET['comp']."\" style='text-decoration: none'><img src='images/de.png' alt='Deutsch'> Deutsch</a>")?>
+          </li>
+          <li><?php echo($lang == "bg" ? "<img src='images/bg.png' alt='български'> български  <i class='fa fa-check' style='color:green;'></i>" :
+"<a href=\"?lang=bg&amp;comp=".$_GET['comp']."\" style='text-decoration: none'><img src='images/bg.png' alt='български'> български</a>")?>
+          </li>
+          <li><?php echo($lang == "fr" ? "<img src='images/fr.png' alt='Français'> Français <i class='fa fa-check' style='color:green;'></i>" :
+"<a href=\"?lang=fr&amp;comp=".$_GET['comp']."\" style='text-decoration: none'><img src='images/fr.png' alt='Français'> Français</a>")?>
+          </li>
+          <li><?php echo($lang == "it" ? "<img src='images/it.png' border='0' alt='Italiano'> Italiano <i class='fa fa-check' style='color:green;'></i>" :
+"<a href=\"?lang=it&amp;comp=".$_GET['comp']."\" style='text-decoration: none'><img src='images/it.png' border='0' alt='Italiano'> Italiano</a>")?>
+          </li>
+          <li><?php echo($lang == "hu" ? "<img src='images/hu.png' border='0' alt='Magyar'> Magyar <i class='fa fa-check' style='color:green;'></i>" :
+"<a href=\"?lang=hu&amp;comp=".$_GET['comp']."\" style='text-decoration: none'><img src='images/hu.png' border='0' alt='Magyar'> Magyar</a>")?>
+          </li>
+          <li><?php echo($lang == "es" ? "<img src='images/es.png' border='0' alt='Español'> Español <i class='fa fa-check' style='color:green;'></i>" :
+"<a href=\"?lang=es&amp;comp=".$_GET['comp']."\" style='text-decoration: none'><img src='images/es.png' border='0' alt='Español'> Español</a>")?>
+          </li>
+          <li><?php echo($lang == "pl" ? "<img src='images/pl.png' border='0' alt='Polska'> Polska <i class='fa fa-check' style='color:green;'></i>" :
+"<a href=\"?lang=pl&amp;comp=".$_GET['comp']."\" style='text-decoration: none'><img src='images/pl.png' border='0' alt='Polska'> Polska</a>")?>
+          </li>
+          <li><?php echo($lang == "pt" ? "<img src='images/pt.png?a' border='0' alt='Português'> Português <i class='fa fa-check' style='color:green;'></i>" :
+"<a href=\"?lang=pt&amp;comp=".$_GET['comp']."\" style='text-decoration: none'><img src='images/pt.png?a' border='0' alt='Português'> Português</a>")?>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</div>
+</nav>
+
+<nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #0f2170;">
+  <div class="container-fluid">
+    <span class="navbar-brand mb-0 h1"><?=$currentComp->CompName()?> [<?=$currentComp->CompDate()?>]</span>
+
+    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+    <?php if (!$isSingleClass && !$isSingleClub) {?>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+          <span id="resultsHeader"><?=$_CHOOSECLASS?></span>
+        </a>
+        <ul class="dropdown-menu" id=divClasses>
+          <li><hr class="dropdown-divider"></li>
+        </ul>
+      </li>
+    <?php }?>
+  </ul>
+  </div>
+</nav>
+<?php }?>
+
 <div class="maindiv">
 
-<table border="0" cellpadding="0" cellspacing="0" width="100%">
-
-<?php if (!$isSingleClass && !$isSingleClub && $showPath) {?>
-<tr>
-    <td class="submenu" colspan="2">
-       <table border="0" cellpadding="0" cellspacing="1" style="font-size: 14px">
-             <tr>
-               <td><a href="https://www.woc2024.org"><img src='images/logo.svg' alt="WOC 2024 logo" width="70px" height="30px"/></a></td>
-               <td><a href="index.php?lang=<?=$lang?>&amp;"><?=$_CHOOSECMP?></a> >> <?=$currentComp->CompName()?> [<?=$currentComp->CompDate()?>]</td>
-             </tr>
-       </table>
-     </td>
-  </tr>
-<?php }?>
-<!-- End SUB MENU -->
-
-  <tr>
-
-    <td class="searchmenu" colspan="2" style="" valign=top>
-
-       <table border="0" cellpadding="0" cellspacing="0">
-
-             <tr>
-
-               <td valign=top>
-
-			<?php if (!isset($_GET['comp'])) {
-
-			    ?>
-
-				<h1 class="categoriesheader">Ett fel uppstod? Har du valt tävling?</h1>
-
-			<?php
-
-			} else {
-
-			    ?>
-
-<?php if (!$showPath) {?>
-<h1 class="categoriesheader" style="margin-bottom: 4px; color: black"><?=$currentComp->CompName()?> [<?=$currentComp->CompDate()?>]</h1>
-<?php }?>
-<?php if (!$isSingleClass && !$isSingleClub) {?>
-			<div id="langchooser">
-                        | <?php echo($lang == "en" ? "<img src='images/en.png' alt='English'> English" :
-"<a href=\"?lang=en&amp;comp=".$_GET['comp']."\" style='text-decoration: none'><img src='images/en.png' alt='English'> English</a>")?>
-                        | <?php echo($lang == "sv" ? "<img src='images/se.png' alt='Svenska'> Svenska" :
-"<a href=\"?lang=sv&amp;comp=".$_GET['comp']."\" style='text-decoration: none'><img src='images/se.png' alt='Svenska'> Svenska</a>")?>
-                        | <?php echo($lang == "fi" ? "<img src='images/fi.png' alt='Suomeksi'> Suomeksi" :
-"<a href=\"?lang=fi&amp;comp=".$_GET['comp']."\" style='text-decoration: none'><img src='images/fi.png'  alt='Suomeksi'> Suomeksi</a>")?>
-                        | <?php echo($lang == "ru" ? "<img src='images/ru.png' alt='Русский'> Русский" :
-"<a href=\"?lang=ru&amp;comp=".$_GET['comp']."\" style='text-decoration: none'><img src='images/ru.png' alt='Русский'> Русский</a>")?>
-                        | <?php echo($lang == "cz" ? "<img src='images/cz.png' alt='Česky'> Česky" :
-"<a href=\"?lang=cz&amp;comp=".$_GET['comp']."\" style='text-decoration: none'><img src='images/cz.png' alt='Česky'> Česky</a>")?>
-                        | <?php echo($lang == "de" ? "<img src='images/de.png' alt='Deutsch'> Deutsch" :
-"<a href=\"?lang=de&amp;comp=".$_GET['comp']."\" style='text-decoration: none'><img src='images/de.png' alt='Deutsch'> Deutsch</a>")?>
-                        | <?php echo($lang == "bg" ? "<img src='images/bg.png' alt='български'> български" :
-"<a href=\"?lang=bg&amp;comp=".$_GET['comp']."\" style='text-decoration: none'><img src='images/bg.png' alt='български'> български</a>")?>
-			| <?php echo($lang == "fr" ? "<img src='images/fr.png' alt='Français'> Français" :
-"<a href=\"?lang=fr&amp;comp=".$_GET['comp']."\" style='text-decoration: none'><img src='images/fr.png' alt='Français'> Français</a>")?>
-                        | <?php echo($lang == "it" ? "<img src='images/it.png' border='0' alt='Italiano'> Italiano" :
-"<a href=\"?lang=it&amp;comp=".$_GET['comp']."\" style='text-decoration: none'><img src='images/it.png' border='0' alt='Italiano'> Italiano</a>")?> 
-                        | <?php echo($lang == "hu" ? "<img src='images/hu.png' border='0' alt='Magyar'> Magyar" :
-"<a href=\"?lang=hu&amp;comp=".$_GET['comp']."\" style='text-decoration: none'><img src='images/hu.png' border='0' alt='Magyar'> Magyar</a>")?> 
-                        | <?php echo($lang == "es" ? "<img src='images/es.png' border='0' alt='Español'> Español" :
-"<a href=\"?lang=es&amp;comp=".$_GET['comp']."\" style='text-decoration: none'><img src='images/es.png' border='0' alt='Español'> Español</a>")?>
-                        | <?php echo($lang == "pl" ? "<img src='images/pl.png' border='0' alt='Polska'> Polska" :
-"<a href=\"?lang=pl&amp;comp=".$_GET['comp']."\" style='text-decoration: none'><img src='images/pl.png' border='0' alt='Polska'> Polska</a>")?>
-                        | <?php echo($lang == "pt" ? "<img src='images/pt.png?a' border='0' alt='Português'> Português" :
-"<a href=\"?lang=pt&amp;comp=".$_GET['comp']."\" style='text-decoration: none'><img src='images/pt.png?a' border='0' alt='Português'> Português</a>")?>
-
-|
-
-</div>
-<?php }?>
 <?php if($showLastPassings) {?>
-			<table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color:#555556; color:#FFF; padding: 10px; margin-top: 3px;border-radius: 5px">
-			<tr>
-			<!--Customized logo -->
-			<!--<td width="161">
-			<img src="images/fin5.png"/></td>-->
-			<td valign="top"><b><?=$_LASTPASSINGS?></b><br>
-<div id="divLastPassings">
+<div class="accordion" id="accordionExample">
+  <div class="accordion-item">
+    <h2 class="accordion-header" id="headingOne">
+      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+        <?=$_LASTPASSINGS?>
+      </button>
+    </h2>
+    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+      <div id="divLastPassings" class="accordion-body">
+      </div>
+    </div>
+  </div>
 </div>
-</td>
-<td valign="top" style="padding-left: 5px; width: 200px; text-align:right">
-<span id="setAutomaticUpdateText"><b><?=$_AUTOUPDATE?>:</b> <?=$_ON?> | <a href="javascript:LiveResults.Instance.setAutomaticUpdate(false);"><?=$_OFF?></a></span><br>
-<b><?=$_TEXTSIZE?>:</b> <a href="javascript:changeFontSize(1);"><?=$_LARGER?></a> | <a href="javascript:changeFontSize(-1);"><?=$_SMALLER?></a><br><br>
-<a href="dok/help.php?lang=<?=$lang?>" target="_blank"><?=$_INSTRUCTIONSHELP?></a>
-</td>
-</tr></table><br>
-<?php }?>
-			<table border="0" cellpadding="0" cellspacing="0" width="100%">
-
-			<tr>
-<?php if (!$isSingleClass && !$isSingleClub) {?>
-			<td width=70 valign="top" style="padding-right: 5px"><b><?=$_CHOOSECLASS?></b><br>
-
-<div id="divClasses">
-</div>
-</td>
 <?php }?>
 
-
-
-			<td valign="top">
-		<div><span id="resultsHeader" style="font-size: 14px"><b><?=$_NOCLASSCHOSEN?></b></span><span style="margin-left: 10px"><?php if (!$isSingleClass) {?><a href="javascript:LiveResults.Instance.newWin()" style="text-decoration: none"><img class="eI" style="vertical-align: middle" src="images/cleardot.gif" alt="<?=$_OPENINNEWWINDOW?>" border="0" title="<?=$_OPENINNEWWINDOW?>"> <?=$_OPENINNEWWINDOW?></a> <?php }?><span id="txtResetSorting"></span></span></div>
+<div>&nbsp<span id="txtResetSorting"></span></div>
 <table id="divResults" width="100%">
-<tbody>
-<tr><td></td></tr>
-</tbody>
-</table><br><br>
-
-<font color="AAAAAA">* <?=$_HELPREDRESULTS?></font>
-
-</td>
-
-			</tr>
-
-			</table>
-
-			<?php }?>
-
-		</td>
-<td valign="top" style="padding: 20px">
-<div id="twitterfeed">
-<?php
-if (!$isSingleClass && !$isSingleClub && $currentComp->HasTwitter()) {?>
-<script type="text/javascript">
-if(!window.mobilecheck())
-{
-document.write('<a href="#" onclick="removeTwitter()">Remove Twitterfeed</a><br/>');
-//document.write('<a class="twitter-timeline" href="https://twitter.com/tunapeter/lists/ol-liveresults?widgetId=591685055564636161&amp;chrome=noheader&amp;width=400">Related Tweets</a>');
-document.write('<a class="twitter-timeline" href="<?=$currentComp->GetTwitterFeed()?>&amp;chrome=noheader&amp;width=400">Related Tweets</a>');
-document.write("<script type=\"text/javascript\">!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+\"://platform.twitter.com/widgets.js\";fjs.parentNode.insertBefore(js,fjs);}}(document,\"script\",\"twitter-wjs\");");
-document.write('<\/script>');
-}
-function removeTwitter()
-{
-	$('#twitterfeed').hide();
-	$('#twitter-widget-0').remove();
-}
-</script>
-<?php
-}
-?>
-
-</div>
-</td>
-<?php if ($currentComp->HasVideo()) {?>
-<td valign="top" style="padding: 5px">
-			<table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color:#000000; color:#FFF; padding: 10px; margin-top: 10px">
-				<tr>
-					<td valign="top"><b>Live Video/Audio</b><br>
-					<?=$currentComp->GetVideoEmbedCode()?>
-					</td>
-				</tr>
-			</table>
-</td>
-<?php }?>
-
-	     </tr>
-
-	</table>
-
-
-
-     </td>
-
-  </tr>
-
-
-
 </table>
 
-<p align="left">&copy;2012-, <?=$_NOTICE?></p>
-
-
+<font color="AAAAAA">* <?=$_HELPREDRESULTS?></font>
+<p align="left">&copy;2012-2023, <?=$_NOTICE?></p>
 
 </div>
 
-<br><br>
-
 </body>
-
 </html>

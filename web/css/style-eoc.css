@@ -2,7 +2,10 @@
 /* --- GENERAL TAGS CLASSES --- */
 /*------------------------------*/
 
-body {background-color: #ffffff; margin-top:5px; margin-left:5px; font-size:68.75%; font-family: arial, helvetica, verdana, geneva, sans-serif;}
+body {background-color: #ffffff; margin-top:5px; margin-left:5px; font-family: arial, helvetica, verdana, geneva, sans-serif;}
+
+#collapseOne {background-color:#e7f1ff !important;}
+.accordion-button {font-size: 1.5rem !important;}
 
 /* html documents within iframes */
 body.iframed {margin-left:0px; margin-right:0px; font-size:68.75%; font-family: arial, helvetica, verdana, geneva, sans-serif;}
