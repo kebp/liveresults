@@ -318,8 +318,10 @@ $(document).ready(function()
 <table id="divResults" width="100%">
 </table>
 
-<font color="AAAAAA">* <?=$_HELPREDRESULTS?></font>
-<p align="left">&copy;2012-2023, <?=$_NOTICE?></p>
+<div id=divFooter> 
+  <font color="AAAAAA">* <?=$_HELPREDRESULTS?></font>
+  <p align="left">&copy;2012-2023, <?=$_NOTICE?></p>
+</div>
 
 </div>
 
