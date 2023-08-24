@@ -275,7 +275,7 @@ $(document).ready(function()
 
 <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #0f2170;">
   <div class="container-fluid">
-    <span class="navbar-brand mb-0 h1"><?=$currentComp->CompName()?> [<?=$currentComp->CompDate()?>]</span>
+    <span class="navbar-brand mb-0 h1"><?=$currentComp->CompName()?> &#8210; <?=$currentComp->CompDate()?></span>
 
     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
     <?php if (!$isSingleClass && !$isSingleClub) {?>
