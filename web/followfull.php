@@ -205,9 +205,6 @@ $(document).ready(function()
           <a class="nav-link active" aria-current="page" href="index.php">Home</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="dok/help.php?lang=<?=$lang?>" target="_blank"><?=$_INSTRUCTIONSHELP?></a>
-        </li>
-        <li class="nav-item">
           <span id="setAutomaticUpdateText">
             <a class="nav-link active" aria-current="page" href="javascript:LiveResults.Instance.setAutomaticUpdate(false);"><?=$_AUTOUPDATE?>&nbsp<i class="fa fa-check-square-o" aria-hidden="true"></i></a>
           </span>
