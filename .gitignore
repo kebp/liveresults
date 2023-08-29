@@ -21,6 +21,7 @@ build/
 bld/
 [Bb]in/
 [Oo]bj/
+LiveResults.js
 
 # MSTest test Results
 [Tt]est[Rr]esult*/

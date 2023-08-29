@@ -61,7 +61,7 @@ table.dataTable tr.even td.sorting_3 { background-color: #DFDFDF; }
 .dataTables_wrapper {
 	position: relative;
 	clear: both;
-	*zoom: 1;
+	overflow-x: scroll;
 }
 .dataTables_wrapper .ui-widget-header {
 	font-weight: normal;
