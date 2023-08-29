@@ -7,6 +7,14 @@ body {background-color: #ffffff; font-family: arial, helvetica, verdana, geneva,
 #collapseOne {background-color:#e7f1ff !important;}
 .accordion-button {font-size: 1.5rem !important;}
 
+a.navbar-brand img {
+  width: 14vw;
+  max-width: 200px;
+  min-width: 120px;
+  height: auto;
+  aspect-ratio: 10 / 3;
+}
+
 /* html documents within iframes */
 body.iframed {margin-left:0px; margin-right:0px; font-size:68.75%; font-family: arial, helvetica, verdana, geneva, sans-serif;}
 
