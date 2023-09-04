@@ -124,7 +124,7 @@
                     var data = this.currentTable.fnGetData();
                     var dt = new Date();
                     var currentTimeZoneOffset = -1*new Date().getTimezoneOffset();
-                    var eventZoneOffset = (((<any>dt).dst() ? 2 : 1) + this.eventTimeZoneDiff) * 60;
+                    var eventZoneOffset = (((<any>dt).dst() ? 1 : 0) + this.eventTimeZoneDiff) * 60;
                     var timeZoneDiff = eventZoneOffset - currentTimeZoneOffset;
                     
                     var time = (dt.getSeconds() + (60 * dt.getMinutes()) + (60 * 60 * dt.getHours())) * 100 
