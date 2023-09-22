@@ -589,7 +589,7 @@ function getAllSplitControls()
 						$ret[$dbId]["Time"] = "";
 						$ret[$dbId]["Status"] = "9";
                                                 $ret[$dbId]["Changed"] = "";
-                                                $ret[$dbId]["FinalPos"] = $row['finalPosition'];
+                                                $ret[$dbId]["FinalPos"] = "0";
 					}
 
 					$split = $row['Control'];
@@ -598,6 +598,7 @@ function getAllSplitControls()
 						$ret[$dbId]["Time"] = $row['Time'];
 						$ret[$dbId]["Status"] = $row['Status'];
 						$ret[$dbId]["Changed"] = $row['Changed'];
+                                                $ret[$dbId]["FinalPos"] = $row['finalPosition'];
 
 					}
 					elseif ($split == 100)
