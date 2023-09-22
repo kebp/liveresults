@@ -107,7 +107,9 @@ if ($_GET['method'] == 'getcompetitions') {
         if (!$first) {
             $ret .=",$br";
         }
-        $ret .= "{\"passtime\": \"".date("H:i:s", strtotime($pass['Changed']))."\",
+        $dt = new DateTime($pass['Changed'], new DateTimeZone('UTC'));
+        $dt -> setTimeZone(new DateTimeZone('Europe/London'));
+        $ret .= "{\"passtime\": \"". $dt->format("G:i:s")."\",
 					\"runnerName\": \"".$pass['Name']."\",
 					\"class\": \"".$pass['class']."\",
 					\"control\": ".$pass['Control'].",
@@ -389,7 +391,7 @@ if ($_GET['method'] == 'getcompetitions') {
             $cp = "-";
             $progress = 100;
         } elseif ($place == $lastplace) {
-            $cp = "=";
+            $cp = strval($place) . "=";
             $progress = 100;
         }
 
