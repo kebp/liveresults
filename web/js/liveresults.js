@@ -20,7 +20,7 @@ var LiveResults;
             this.runnerStatus = runnerStatus;
             this.showTenthOfSecond = showTenthOfSecond;
             this.updateAutomatically = true;
-            this.updateInterval = 3000;
+            this.updateInterval = 10000;
             this.classUpdateInterval = 60000;
             this.classUpdateTimer = null;
             this.passingsUpdateTimer = null;

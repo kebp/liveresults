@@ -7,7 +7,7 @@
         // ReSharper disable once InconsistentNaming
         public static VERSION : string = "2023-06-02";
         private updateAutomatically: boolean = true;
-        private updateInterval: number = 3000;
+        private updateInterval: number = 10000;
         private classUpdateInterval: number = 60000;
 
         private classUpdateTimer : any = null;
