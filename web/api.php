@@ -99,7 +99,7 @@ if ($_GET['method'] == 'getcompetitions') {
 } elseif ($_GET['method'] == 'getlastpassings') {
 
     $currentComp = new Emma($_GET['comp']);
-    $lastPassings = $currentComp->getLastPassings(5);
+    $lastPassings = $currentComp->getLastPassings(7);
 
     $first = true;
     $ret = "";
