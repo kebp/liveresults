@@ -100,7 +100,7 @@ var LiveResults;
                         var param = value.className;
                         if (param && param.length > 0)
                             param = param.replace('\'', '\\\'');
-                        str += "<li><a class=\"dropdown-item\" href=\"javascript:LiveResults.Instance.chooseClass('" + param + "')\">" + value.className + "</a></li>";
+                        str += "<li><a class=\"dropdown-item\" href=\"javascript:LiveResults.Instance.chooseClass('" + param + "')\">" + decodeURIComponent(value.className) + "</a></li>";
                     });
                     $("#" + this.classesDiv).html(str);
                     this.lastClassListHash = data.hash;

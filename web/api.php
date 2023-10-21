@@ -237,7 +237,7 @@ if ($_GET['method'] == 'getcompetitions') {
         echo(",$br \"hash\": \"". $hash."\"}");
     }
 } elseif ($_GET['method'] == 'getclassresults') {
-    $class = $_GET['class'];
+    $class = rawurldecode($_GET['class']);
     $currentComp = new Emma($_GET['comp']);
     $results = $currentComp->getAllSplitsForClass($class);
     $splits = $currentComp->getSplitControlsForClass($class);

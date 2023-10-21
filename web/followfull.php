@@ -25,10 +25,10 @@ if (isset($_GET['showpath']) && $_GET['showpath'] == "false") {
 $singleClass = "";
 $singleClub = "";
 if ($isSingleClass) {
-    $singleClass = $_GET['class'];
+    $singleClass = rawurldecode($_GET['class']);
 }
 if ($isSingleClub) {
-    $singleClub = utf8_decode(rawurldecode($_GET['club']));
+    $singleClub = rawurldecode($_GET['club']);
 }
 
 $showLastPassings = !($isSingleClass || $isSingleClub) || (isset($_GET['showLastPassings']) && $_GET['showLastPassings'] == "true");
