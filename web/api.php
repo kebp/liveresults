@@ -16,9 +16,9 @@ $RunnerStatus = array("1" =>  $_STATUSDNS, "2" => $_STATUSDNF, "11" =>  $_STATUS
 
 header('content-type: application/json; charset='.$CHARSET);
 header('Access-Control-Allow-Origin: *');
-header('cache-control: max-age=15');
+header('cache-control: max-age=10');
 header('pragma: public');
-header('Expires: '.gmdate('D, d M Y H:i:s \G\M\T', time() + 15));
+header('Expires: '.gmdate('D, d M Y H:i:s \G\M\T', time() + 10));
 
 if (!isset($_GET['method'])) {
     $_GET['method'] = null;
