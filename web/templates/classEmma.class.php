@@ -20,10 +20,6 @@ class Emma
    var $m_MultiDayStage = -1;
    var $m_MultiDayParent = -1;
    
-   var $m_VideoFormat = "";
-   var $m_VideoUrl = "";
-   var $m_TwitterFeed = "";
-   
 	var $m_Conn;
 
 	private static function openConnection() {
@@ -202,7 +198,7 @@ public static function UpdateCompetition($id,$name,$org,$date,$tenths,$public,$t
         {
         $conn = self::openConnection();
 
-	 $result = mysqli_query($conn, "select compName, compDate,tavid,organizer,public,tenths,timediff, timezone, videourl, videotype,multidaystage,multidayparent from login where tavid=$compid");
+	 $result = mysqli_query($conn, "select compName, compDate,tavid,organizer,public,tenths,timediff, timezone, multidaystage,multidayparent from login where tavid=$compid");
 
          $ret = null;
 
@@ -245,15 +241,6 @@ public static function UpdateCompetition($id,$name,$org,$date,$tenths,$public,$t
 
                     $this->m_Tenths = $tmp['tenths'];
 
-		    if (isset($tmp["videourl"]))
-		    	$this->m_VideoUrl = $tmp["videourl"];
-
-		    if (isset($tmp["videotype"]))
-				$this->m_VideoFormat= $tmp["videotype"];
-        
-         if (isset($tmp["twitter"]))
-				$this->m_TwitterFeed= $tmp["twitter"];
-        
 		    if (isset($tmp['multidaystage']))
 		    {
 		    	if ($tmp['multidaystage'] != null && $tmp['multidayparent'] != null && $tmp['multidaystage'] > 1)
@@ -278,31 +265,6 @@ public static function UpdateCompetition($id,$name,$org,$date,$tenths,$public,$t
                 return $this->m_Tenths;
         }
   
-  function HasVideo()
-	{
-		return $this->m_VideoFormat != "";
-	}
-  
-   function HasTwitter()
-	{
-		return $this->m_TwitterFeed != "";
-	}
-
-	function GetVideoEmbedCode()
-	{
-		if ($this->m_VideoFormat == "bambuser")
-		{
-			return '<iframe src="http://embed.bambuser.com/channel/' . $this->m_VideoUrl . '" width="460" height="403" frameborder="0">Your browser does not support iframes.</iframe>';
-		}
-		return "";
-	}
-  
-  function GetTwitterFeed()
-  {
-    return $this->m_TwitterFeed;
-  }
-
-
 	function CompName()
 
 	{
