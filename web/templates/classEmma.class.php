@@ -31,28 +31,21 @@ class Emma
 		mysqli_set_charset($conn, self::$MYSQL_CHARSET);
 		return $conn;
 	}
-        public static function GetCompetitions()
 
-        {
-            $conn = self::openConnection();
+public static function GetCompetitions() {
+    $conn = self::openConnection();
 
-	 $result = mysqli_query($conn, "select compName, compDate,tavid,organizer,timediff,multidaystage,multidayparent from login where public = 1 order by compDate desc");
+    $result = mysqli_query($conn, "select compName, compDate,tavid,organizer,timediff,multidaystage,multidayparent from login where public = 1 order by compDate desc");
 
-         $ret = Array();
+    $ret = Array();
+    while ($tmp = mysqli_fetch_array($result)) {
+        $ret[] = $tmp;
+    }
 
-         while ($tmp = mysqli_fetch_array($result))
+    mysqli_free_result($result);
 
-	 {
-
- 		$ret[] = $tmp;
-
-         }
-
-		mysqli_free_result($result);
-
- 	return $ret;
-
-        }
+    return $ret;
+}
 
 public static function GetCompetitionsToday()
 
@@ -110,13 +103,22 @@ public static function DelRadioControl($compid,$code,$classname)
 
         }
 
-        public static function DelAllRadioControls($compid)
-		{
-        $conn = self::openConnection();
-			mysqli_query($conn, "delete from splitcontrols where tavid=$compid");
-   }
+public static function DelAllRadioControls($compid) {
+    $conn = self::openConnection();
+    mysqli_query($conn, "delete from splitcontrols where tavid=$compid");
+}
 
 
+public static function DelEvent($compid) {
+    $conn = self::openConnection();
+    mysqli_query($conn, "delete from login where tavid=$compid");
+}    
+
+
+public static function DelRunAndRes($compid) {
+    $conn = self::openConnection();
+    mysqli_query($conn, "delete from runners where tavid=$compid");
+}
 
 	public static function CreateCompetition($name,$org,$date,$tenths)
         {

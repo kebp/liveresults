@@ -26,9 +26,8 @@ CREATE TABLE `results` (
   PRIMARY KEY (`tavid`,`dbid`,`control`),
   KEY `Results_Indexd` (`tavid`,`status`,`time`),
   KEY `resIndex2` (`tavid`,`dbid`,`control`,`status`,`time`),
-  KEY `dbid` (`dbid`),
-  CONSTRAINT `results_ibfk_1` FOREIGN KEY (`dbid`) REFERENCES `runners` (`dbid`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `results_ibfk_2` FOREIGN KEY (`tavid`) REFERENCES `login` (`tavid`) ON DELETE CASCADE ON UPDATE CASCADE
+  KEY `dbid` (`dbid`,`tavid`),
+  CONSTRAINT `results_ibfk_1` FOREIGN KEY (`dbid`, `tavid`) REFERENCES `runners` (`dbid`, `tavid`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `runners` (
@@ -54,4 +53,12 @@ CREATE TABLE `splitcontrols` (
   `name` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`tavid`,`classname`,`corder`,`code`),
   CONSTRAINT `splitcontrols_ibfk_1` FOREIGN KEY (`tavid`) REFERENCES `login` (`tavid`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `runneraliases` (
+  `compid` int(11) NOT NULL,
+  `sourceid` varchar(50) NOT NULL,
+  `id` int(11) NOT NULL,
+  PRIMARY KEY (`compid`,`sourceid`),
+  CONSTRAINT `runneraliases_ibfk_1` FOREIGN KEY (`compid`) REFERENCES `runners` (`tavid`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
