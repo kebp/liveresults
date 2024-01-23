@@ -56,7 +56,7 @@ header('Content-Type: text/html; charset='.$CHARSET);
 
 <head><title><?=$_TITLE?></title>
 
-<link rel="stylesheet" type="text/css" href="../css/style.css">
+<link rel="stylesheet" type="text/css" href="../css/style-eoc.css">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin "anonymous">
 <meta name="robots" content="noindex">
 <meta http-equiv="Content-Type" content="text/html;charset=<?=$CHARSET?>">
@@ -202,6 +202,7 @@ function confirmDelAllRadio() {
 
 <!-- Event deletion functions -->
 <hr/><h1 class="categoriesheader">Deletion</h1>
+<p class="fw-bolder text-danger fs-5" >Ensure that Emma uploads are paused / halted before using the delete functions.</p>
 <form name="formdelevt" action="editComp.php?compid=<?= $_GET['compid']?>&what=de"  method="post">
 <input type="button" class="btn btn-danger" value="Delete Event" onclick="confirmDelEvent()"/>
 </form>
