@@ -94,6 +94,19 @@ public static function GetRadioControls($compid)
  	return $ret;
 
         }
+
+public static function GetCompetitionStats($compid) {
+  $conn = self::openConnection();
+  $result = mysqli_query($conn, "select count(distinct class) as Classes, count(name) as Names from runners where tavid=$compid");
+  $ret = null;
+  while ($tmp = mysqli_fetch_array($result)) {
+    $ret = $tmp;
+  }
+  mysqli_free_result($result);
+  return $ret;
+}
+
+
 public static function DelRadioControl($compid,$code,$classname)
 
         {

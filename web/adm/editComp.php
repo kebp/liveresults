@@ -7,6 +7,9 @@ if (count($comp) == 0) {
     exit;
 }
 
+$rcontrols = Emma::GetRadioControls($_GET['compid']);
+$stats = Emma::GetCompetitionStats($_GET['compid']);
+
 if (isset($_POST['btnSave']))
 {
 	Emma::UpdateCompetition($_GET['compid'],$_POST['name'],$_POST['org'],$_POST['date'],$_POST['tenths'],$_POST['public'],$_POST['timediff']);
@@ -100,21 +103,29 @@ function confirmDelete(msg,url)
 }
 
 function confirmDelEvent() {
-  if (confirm('Are you SURE you want to delete the complete event?')) {
+  var e = <?php echo $_GET['compid'] ?>;
+  var n = <?php echo $stats['Names'] ?>;
+  var t = <?php echo '"' . $comp['compName'] . '"' ?>;
+  if (confirm('Are you SURE you want to delete the entire event ' + t + ' (' + e + ') with ' + n + ' runners?')) {
     var x = document.getElementsByName('formdelevt');
     x[0].submit();
   }
 }
 
 function confirmDelResults() {
-  if (confirm('Are you SURE you want to delete all runners and results?')) {
+  var c = <?php echo $stats['Classes'] ?>;
+  var n = <?php echo $stats['Names'] ?>;
+  var t = <?php echo '"' . $comp['compName'] . '"' ?>;
+  if (confirm('Are you SURE you want to delete all ' + n + ' runners in ' + c + ' classes and all their results from ' + t + '?')) {
     var x = document.getElementsByName('formdelrun');
     x[0].submit();
   }
 }
 
 function confirmDelAllRadio() {
-  if (confirm('Are you SURE you want to delete all radio controls?')) {
+  var rc = <?php echo sizeof($rcontrols)?>;
+  var t = <?php echo '"' . $comp['compName'] . '"' ?>;
+  if (confirm('Are you SURE you want to delete all ' + rc + ' radio controls from ' + t + '?')) {
     var x = document.getElementsByName('formdelradio');
     x[0].submit();
   }
