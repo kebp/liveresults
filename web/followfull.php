@@ -192,7 +192,7 @@ $(document).ready(function()
 <?php if (!$isSingleClass && !$isSingleClub && $showPath) {?>
 <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #0f2170;">
   <div class="container-fluid">
-  <a class="navbar-brand" href="https://www.woc2024.org">
+  <a class="navbar-brand" href="https://results.woc2024.org">
     <img src="images/logo.svg" alt="WOC2024 logo" width="200" height="60" class="d-inline-block align-text-top">
   </a>
 
@@ -202,7 +202,7 @@ $(document).ready(function()
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="/">Home</a>
+          <a class="nav-link active" aria-current="page" href="/woc">Home</a>
         </li>
         <li class="nav-item">
           <span id="setAutomaticUpdateText">
