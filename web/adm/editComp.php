@@ -201,7 +201,7 @@ function confirmDelAllRadio() {
 <input type="text" name="org" size="35" value="<?=$comp['organizer']?>"/><br/>
 <b>Date (format yyyy-mm-dd)</b><br/>
 <input type="text" name="date" size="35" value="<?=date("Y-m-d",strtotime($comp['compDate']))?>"/> (ex. 2008-02-03)<br/>
-<b>Timezonediff (hours, 0 for GMT, +1 for BST or CET and +2 for CEST)</b><br/>
+<b>Timezonediff (hours: 0 for GMT / BST, 1 for  CET / CEST)</b><br/>
 <input type="text" name="timediff" size="10" value="<?=$comp['timediff']?>"/><br/>
 
 <b>Public</b>
