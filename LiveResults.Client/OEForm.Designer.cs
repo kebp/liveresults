@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(OEForm));
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.txtZeroTime = new System.Windows.Forms.TextBox();
             this.lblZeroTime = new System.Windows.Forms.Label();
@@ -54,6 +55,7 @@
             this.chkUploadStarttimes = new System.Windows.Forms.CheckBox();
             this.button4 = new System.Windows.Forms.Button();
             this.chkAutoCreateRadioControls = new System.Windows.Forms.CheckBox();
+            this.VersionTextBox = new System.Windows.Forms.TextBox();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.fileSystemWatcher1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.fsWatcherOS)).BeginInit();
@@ -176,7 +178,7 @@
             this.listBox1.FormattingEnabled = true;
             this.listBox1.Location = new System.Drawing.Point(12, 235);
             this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(576, 186);
+            this.listBox1.Size = new System.Drawing.Size(576, 199);
             this.listBox1.TabIndex = 1;
             // 
             // button2
@@ -290,11 +292,24 @@
             this.chkAutoCreateRadioControls.Text = "Automatically create radiocontrols";
             this.chkAutoCreateRadioControls.UseVisualStyleBackColor = true;
             // 
+            // VersionTextBox
+            // 
+            this.VersionTextBox.BackColor = System.Drawing.SystemColors.Control;
+            this.VersionTextBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.VersionTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.VersionTextBox.Location = new System.Drawing.Point(288, 440);
+            this.VersionTextBox.Name = "VersionTextBox";
+            this.VersionTextBox.Size = new System.Drawing.Size(300, 13);
+            this.VersionTextBox.TabIndex = 13;
+            this.VersionTextBox.TabStop = false;
+            this.VersionTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            // 
             // OEForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(592, 444);
+            this.ClientSize = new System.Drawing.Size(592, 463);
+            this.Controls.Add(this.VersionTextBox);
             this.Controls.Add(this.chkAutoCreateRadioControls);
             this.Controls.Add(this.button4);
             this.Controls.Add(this.chkUploadStarttimes);
@@ -306,6 +321,7 @@
             this.Controls.Add(this.button2);
             this.Controls.Add(this.listBox1);
             this.Controls.Add(this.groupBox1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "OEForm";
             this.Text = "LiveResults Client, UploadClient";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.OEForm_FormClosing);
@@ -345,5 +361,6 @@
         private System.Windows.Forms.Label lblZeroTime;
         private System.Windows.Forms.Button button4;
         private System.Windows.Forms.CheckBox chkAutoCreateRadioControls;
+        private System.Windows.Forms.TextBox VersionTextBox;
     }
 }

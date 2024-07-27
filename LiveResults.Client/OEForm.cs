@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.IO;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -12,6 +13,7 @@ using LiveResults.Client.Parsers;
 using LiveResults.Model;
 
 //  K.Roberts   KR  May 2023    Modified to support position in results for WOC2024. 
+//  K.Roberts   KR  Apr 2024    Added build date display
 
 namespace LiveResults.Client
 {
@@ -45,14 +47,18 @@ namespace LiveResults.Client
 
         readonly List<FormatItem> m_supportedFormats = new List<FormatItem>();
         private int m_compid = -1;
+
         public OEForm(bool showCSVFormats = true)
         {
             InitializeComponent();
+
+            VersionTextBox.Text = $"Version {BuildInfo.BuildDateText} ";
+
             Text = Text + @", " + Encoding.Default.EncodingName + @"," + Encoding.Default.CodePage;
             fileSystemWatcher1.Changed += new FileSystemEventHandler(fileSystemWatcher1_Changed);
             m_clients = new List<EmmaMysqlClient>();
 
-            m_supportedFormats.Add(new FormatItem("IOF-XML", "Export files in IOF-XML (version 2 supported)", Format.Iofxml));
+            m_supportedFormats.Add(new FormatItem("IOF-XML", "Export files in IOF-XML (versions 2 and 3 supported)", Format.Iofxml));
             if (showCSVFormats)
             {
                 m_supportedFormats.Add(new FormatItem("OE-csv", "CSV files exported from OLEinzel 10.3 and 11", Format.Oecsv));

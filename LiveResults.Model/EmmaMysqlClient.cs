@@ -9,12 +9,21 @@ using System.Text;
 using System.Threading;
 using System.Linq;
 
-//  K.Roberts   KR  May 2023    Modified to support position in results for WOC2024. 
+//  K.Roberts   KR  May 2023    Modified to support position in results for WOC2024.
+//  K.Roberts   KR  Sep 2023    Added ability to log database 
+//  K.Roberts   KR  Sep 2023    Handle changes in result position separately from changes in result time or status
+//  K.ROberts   KR  Nov 2023    Replace use of "REPLACE INTO ..." with "INSERT ... ON DUPLICATE KEY UPDATE ..."
+//                              to allow use of cascading updates and deletes in database. This is required as
+//                              "REPLACE INTO ..." causes a delete then an insert if a row with the key already exists
+//                              and the delete would then trigger cascaded deletes. Whereas, using "INSERT  ... ON
+//                              DUPLICATE KEY UPDATE ..." simply does an update if a row wiht the key already exists
+//                              without triggering any cascaded deletes. Cascadeing deletes was introduced by Kevin
+//                              Parkes when implementing additional event management functionality (delete event, 
+//                              clear event).
 
 namespace LiveResults.Model
 {
     public delegate void LogMessageDelegate(string msg);
-
 
     public class EmmaMysqlClient : IDisposable
     {
@@ -135,6 +144,9 @@ namespace LiveResults.Model
         private readonly List<DbItem> m_itemsToUpdate;
         private readonly bool m_assignIDsInternally;
         private int m_nextInternalId = 1;
+        private bool m_logDBUpdates = false;        // KR
+
+
         public EmmaMysqlClient(string server, int port, string user, string pass, string database, int competitionID, bool assignIDsInternally = false)
         {
             m_runners = new Dictionary<int, Runner>();
@@ -145,6 +157,9 @@ namespace LiveResults.Model
             m_connStr = "Database=" + database + ";Data Source=" + server + ";User Id=" + user + ";Password=" + pass;
             m_connection = new MySqlConnection(m_connStr);
             m_compID = competitionID;
+
+            var logDBUpdates = ConfigurationManager.AppSettings["logdbupdates"];                                // KR
+            if (!string.IsNullOrWhiteSpace(logDBUpdates)) _ = bool.TryParse(logDBUpdates, out m_logDBUpdates);  // KR
         }
 
         public void SetCompetitionId(int compId)
@@ -775,7 +790,10 @@ namespace LiveResults.Model
                                     cmd.Parameters.AddWithValue("?corder", r.Order);
                                     cmd.Parameters.AddWithValue("?code", r.Code);
                                     cmd.Parameters.AddWithValue("?cname", Encoding.UTF8.GetBytes(r.ControlName));
-                                    cmd.CommandText = "REPLACE INTO splitcontrols(tavid,classname,corder,code,name) VALUES (?compid,?name,?corder,?code,?cname)";
+                                    //cmd.CommandText = "REPLACE INTO splitcontrols(tavid,classname,corder,code,name) VALUES (?compid,?name,?corder,?code,?cname)";
+                                    cmd.CommandText = "INSERT INTO splitcontrols(tavid,classname,corder,code,name) VALUES (?compid,?name,?corder,?code,?cname) "
+                                                    + "ON DUPLICATE KEY UPDATE name=?cname";    // KR
+                                    LogDBUpdates("Add radio control", cmd);                     // KR
 
                                     try
                                     {
@@ -801,6 +819,7 @@ namespace LiveResults.Model
                                     cmd.Parameters.AddWithValue("?code", r.Code);
                                     cmd.Parameters.AddWithValue("?cname", Encoding.UTF8.GetBytes(r.ControlName));
                                     cmd.CommandText = "delete from splitcontrols where tavid= ?compid and classname = ?name and corder = ?corder and code = ?code and name = ?cname";
+                                    LogDBUpdates("Delete radio control", cmd);     // KR
 
                                     try
                                     {
@@ -823,12 +842,16 @@ namespace LiveResults.Model
                                     cmd.Parameters.AddWithValue("?compid", m_compID);
                                     cmd.Parameters.AddWithValue("?id", r);
                                     cmd.CommandText = "delete from results where tavid= ?compid and dbid = ?id";
+                                    LogDBUpdates("Delete runner from results", cmd);     // KR
+
                                     try
                                     {
                                         cmd.ExecuteNonQuery();
                                         cmd.CommandText = "delete from runners where tavid= ?compid and dbid = ?id";
+                                        LogDBUpdates("Delete runner from runners", cmd);            // KR
                                         cmd.ExecuteNonQuery();
                                         cmd.CommandText = "delete from runneraliases where compid= ?compid and id = ?id";
+                                        LogDBUpdates("Delete runner from runner aliases", cmd);     // KR
                                         cmd.ExecuteNonQuery();
                                     }
                                     catch (Exception ee)
@@ -853,7 +876,10 @@ namespace LiveResults.Model
                                         cmd.Parameters.AddWithValue("?bib", r.Bib != null ? Encoding.UTF8.GetBytes(r.Bib) : null);
 
                                         cmd.Parameters.AddWithValue("?id", r.ID);
-                                        cmd.CommandText = "REPLACE INTO runners (tavid,name,club,class,brick,dbid,bib) VALUES (?compid,?name,?club,?class,0,?id,?bib)";
+                                        //cmd.CommandText = "REPLACE INTO runners (tavid,name,club,class,brick,dbid,bib) VALUES (?compid,?name,?club,?class,0,?id,?bib)";
+                                        cmd.CommandText = "INSERT INTO runners (tavid,name,club,class,brick,dbid,bib) VALUES (?compid,?name,?club,?class,0,?id,?bib) "
+                                                        + "ON DUPLICATE KEY UPDATE name=?name, club=?club, class=?class, brick=0, bib=?bib";    // KR
+                                        LogDBUpdates("Add runner", cmd);                                                                        // KR
 
 
                                         try
@@ -872,10 +898,13 @@ namespace LiveResults.Model
 
                                         if (!string.IsNullOrEmpty(r.SourceId) && r.SourceId != r.ID.ToString(CultureInfo.InvariantCulture))
                                         {
-                                            cmd.CommandText = "REPLACE INTO runneraliases (compid,sourceid,id) VALUES (?compid,?sourceId,?id)";
                                             cmd.Parameters.AddWithValue("?compid", m_compID);
                                             cmd.Parameters.AddWithValue("?sourceId", r.SourceId);
                                             cmd.Parameters.AddWithValue("?id", r.ID);
+                                            //cmd.CommandText = "REPLACE INTO runneraliases (compid,sourceid,id) VALUES (?compid,?sourceId,?id)";
+                                            cmd.CommandText = "INSERT INTO runneraliases (compid,sourceid,id) VALUES (?compid,?sourceId,?id) "
+                                                            + "ON DUPLICATE KEY UPDATE id=?id";     // KR
+                                            LogDBUpdates("Add runner alias", cmd);                  // KR
                                             try
                                             {
                                                 cmd.ExecuteNonQuery();
@@ -897,25 +926,57 @@ namespace LiveResults.Model
                                         cmd.Parameters.AddWithValue("?time", r.Time);
                                         cmd.Parameters.AddWithValue("?finalPosition", r.Position);      // KR: added position
                                         cmd.Parameters.AddWithValue("?status", r.Status);
-                                        cmd.CommandText = "REPLACE INTO results (tavid,dbid,control,time,finalPosition,status,changed) VALUES(?compid,?id,1000,?time,?finalPosition,?status,Now())";
+                                        //cmd.CommandText = "REPLACE INTO results (tavid,dbid,control,time,finalPosition,status,changed) VALUES(?compid,?id,1000,?time,?finalPosition,?status,Now())";
+                                        cmd.CommandText = "INSERT INTO results (tavid,dbid,control,time,finalPosition,status,changed) VALUES(?compid,?id,1000,?time,?finalPosition,?status,Now()) "
+                                                        + "ON DUPLICATE KEY UPDATE time=?time, finalPosition=?finalPosition, status=?status, changed=Now()";    // KR
+                                        LogDBUpdates("Update result", cmd);                                                                                     // KR
+
                                         cmd.ExecuteNonQuery();
                                         cmd.Parameters.Clear();
 
-                                        FireLogMsg("Runner " + r.Name + "s result updated in DB");
+                                        FireLogMsg("Runner " + r.Name + "'s result updated in DB");
                                         r.ResultUpdated = false;
                                     }
+
+                                    if (r.PositionUpdated)                  // KR: if position updated then update results entry in DB
+                                    {                                       //     and specifically do not update 'changed' which is only
+                                                                            //     updated when the time or status is changed. This was 
+                                                                            //     done to eliminate a torrent of results changed messages
+                                                                            //     in the web pages when runners' positions changed as a 
+                                                                            //     result of a faster runner pushing the others' positions
+                                                                            //     down
+                                        cmd.Parameters.Clear();
+                                        cmd.Parameters.AddWithValue("?compid", m_compID);
+                                        cmd.Parameters.AddWithValue("?id", r.ID);
+                                        cmd.Parameters.AddWithValue("?time", r.Time);
+                                        cmd.Parameters.AddWithValue("?finalPosition", r.Position);
+                                        cmd.Parameters.AddWithValue("?status", r.Status);
+                                        cmd.CommandText = "INSERT INTO results (tavid,dbid,control,time,finalPosition,status,changed) VALUES(?compid,?id,1000,?time,?finalPosition,?status,Now()) "
+                                                        + "ON DUPLICATE KEY UPDATE time=?time, finalPosition=?finalPosition, status=?status";
+                                        LogDBUpdates("Update position", cmd);
+
+                                        cmd.ExecuteNonQuery();
+                                        cmd.Parameters.Clear();
+
+                                        FireLogMsg("Runner " + r.Name + "'s position updated in DB");
+                                        r.PositionUpdated = false;
+                                    }
+
                                     if (r.StartTimeUpdated)
                                     {
                                         cmd.Parameters.Clear();
                                         cmd.Parameters.AddWithValue("?compid", m_compID);
                                         cmd.Parameters.AddWithValue("?id", r.ID);
                                         cmd.Parameters.AddWithValue("?starttime", r.StartTime);
-                                        cmd.Parameters.AddWithValue("?finalPosition", r.Position);      // KR: added position
                                         cmd.Parameters.AddWithValue("?status", r.Status);
-                                        cmd.CommandText = "REPLACE INTO results (tavid,dbid,control,time,finalPosition,status,changed) VALUES(?compid,?id,100,?starttime,?finalPosition,?status,Now())";
+                                        //cmd.CommandText = "REPLACE INTO results (tavid,dbid,control,time,status,changed) VALUES(?compid,?id,100,?starttime,?status,Now())";
+                                        cmd.CommandText = "INSERT INTO results (tavid,dbid,control,time,status,changed) VALUES(?compid,?id,100,?starttime,?status,Now()) "
+                                                        + "ON DUPLICATE KEY UPDATE time=?starttime, status=?status, changed=Now()";      // KR
+                                        LogDBUpdates("Update start time", cmd);                                                     // KR
+
                                         cmd.ExecuteNonQuery();
                                         cmd.Parameters.Clear();
-                                        FireLogMsg("Runner " + r.Name + "s starttime updated in DB");
+                                        FireLogMsg("Runner " + r.Name + "'s starttime updated in DB");
                                         r.StartTimeUpdated = false;
                                     }
                                     if (r.HasUpdatedSplitTimes())
@@ -931,8 +992,13 @@ namespace LiveResults.Model
                                         {
                                             cmd.Parameters["?control"].Value = t.Control;
                                             cmd.Parameters["?time"].Value = t.Time;
-                                            cmd.CommandText = "REPLACE INTO results (tavid,dbid,control,time,status,changed) VALUES(" + m_compID + "," + r.ID + "," + t.Control + "," + t.Time +
-                                                              ",0,Now())";
+                                            //cmd.CommandText = "REPLACE INTO results (tavid,dbid,control,time,status,changed) VALUES(" + m_compID + "," + r.ID + "," + t.Control + "," + t.Time +
+                                            //                  ",0,Now())";
+                                            cmd.CommandText = "INSERT INTO results (tavid,dbid,control,time,status,changed) VALUES(" + m_compID + "," + r.ID + "," + t.Control + "," + t.Time
+                                                            + ",0,Now()) "
+                                                            + "ON DUPLICATE KEY UPDATE time=" + t.Time + ",status=0,changed=Now()";     // KR
+                                            LogDBUpdates("Update split time", cmd);                                                     // KR
+
                                             cmd.ExecuteNonQuery();
                                             t.Updated = false;
                                             FireLogMsg("Runner " + r.Name + " splittime{" + t.Control + "} updated in DB");
@@ -980,6 +1046,61 @@ namespace LiveResults.Model
                 }
                 cmd.ExecuteNonQuery();
             }
+        }
+
+        private void LogDBUpdates(string message, MySqlCommand command)       // KR - added to aid debugging
+        {
+            if (!m_logDBUpdates) return;
+
+            var sb = new StringBuilder();
+            sb.Append('[');
+            sb.Append(DateTime.Now.ToString("dd-MMM-yyyy HH:mm:ss.ffff"));
+            sb.Append("] ");
+            sb.Append(message);
+            sb.Append(" >> ");
+            sb.Append(command.CommandText);
+            sb.Append(" >> ");
+            for (var i = 0; i < command.Parameters.Count; i++)
+            {
+                sb.Append(command.Parameters[i].ParameterName);
+                sb.Append(':');
+                sb.Append(command.Parameters[i].Value.ToString());
+                switch (command.Parameters[i].ParameterName)
+                {
+                    case "?time":
+                    case "?starttime":
+                        {
+                            var val = command.Parameters[i].Value.ToString();
+                            if (long.TryParse(val, out long longVal))
+                            {
+                                var ts = new TimeSpan(longVal * 100000);
+                                sb.Append('(');
+                                sb.Append(ts.ToString(@"hh\:mm\:ss"));
+                                sb.Append(')');
+                            }
+                        }
+                        break;
+                    case "?id":
+                        {
+                            var val = command.Parameters[i].Value.ToString();
+                            if (int.TryParse(val, out int intVal))
+                            {
+                                if (m_runners.ContainsKey(intVal))
+                                {
+                                    var runner = m_runners[intVal];
+                                    sb.Append('(');
+                                    sb.Append(runner.Name);
+                                    sb.Append(')');
+                                }
+                            }
+                        }
+                        break;
+                }
+                if (i < command.Parameters.Count - 1) sb.Append(", ");
+            }
+            sb.Append(Environment.NewLine);
+            var path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "LiveResultsDBUpdate.log");
+            File.AppendAllText(path, sb.ToString());
         }
 
         public override string ToString()

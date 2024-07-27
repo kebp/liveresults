@@ -61,8 +61,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UdpSirapTest", "UdpSirapTes
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LiveResults.Model", "LiveResults.Model\LiveResults.Model.csproj", "{90078189-7B0A-4C17-BCDA-B1F9E564FC5E}"
 EndProject
-Project("{840C416C-B8F3-42BC-B0DD-F6BB14C9F8CB}") = "LiveResults.Client.Installer", "LiveResults.Client.Installer\LiveResults.Client.Installer.aiproj", "{6E3369AD-6FFE-4A2A-9CD2-ACFA3C1C139D}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -165,24 +163,6 @@ Global
 		{90078189-7B0A-4C17-BCDA-B1F9E564FC5E}.ReleaseOLA|Any CPU.Build.0 = Release|Any CPU
 		{90078189-7B0A-4C17-BCDA-B1F9E564FC5E}.ReleaseOS|Any CPU.ActiveCfg = Release|Any CPU
 		{90078189-7B0A-4C17-BCDA-B1F9E564FC5E}.ReleaseOS|Any CPU.Build.0 = Release|Any CPU
-		{6E3369AD-6FFE-4A2A-9CD2-ACFA3C1C139D}.Debug|Any CPU.ActiveCfg = DefaultBuild
-		{6E3369AD-6FFE-4A2A-9CD2-ACFA3C1C139D}.Debug|Any CPU.Build.0 = DefaultBuild
-		{6E3369AD-6FFE-4A2A-9CD2-ACFA3C1C139D}.DebugOE|Any CPU.ActiveCfg = DefaultBuild
-		{6E3369AD-6FFE-4A2A-9CD2-ACFA3C1C139D}.DebugOE|Any CPU.Build.0 = DefaultBuild
-		{6E3369AD-6FFE-4A2A-9CD2-ACFA3C1C139D}.DebugOLA|Any CPU.ActiveCfg = DefaultBuild
-		{6E3369AD-6FFE-4A2A-9CD2-ACFA3C1C139D}.DebugOLA|Any CPU.Build.0 = DefaultBuild
-		{6E3369AD-6FFE-4A2A-9CD2-ACFA3C1C139D}.DebugOS|Any CPU.ActiveCfg = DefaultBuild
-		{6E3369AD-6FFE-4A2A-9CD2-ACFA3C1C139D}.DebugOS|Any CPU.Build.0 = DefaultBuild
-		{6E3369AD-6FFE-4A2A-9CD2-ACFA3C1C139D}.DebugSIT|Any CPU.ActiveCfg = DefaultBuild
-		{6E3369AD-6FFE-4A2A-9CD2-ACFA3C1C139D}.DebugSIT|Any CPU.Build.0 = DefaultBuild
-		{6E3369AD-6FFE-4A2A-9CD2-ACFA3C1C139D}.DefaultBuild|Any CPU.ActiveCfg = DefaultBuild
-		{6E3369AD-6FFE-4A2A-9CD2-ACFA3C1C139D}.DefaultBuild|Any CPU.Build.0 = DefaultBuild
-		{6E3369AD-6FFE-4A2A-9CD2-ACFA3C1C139D}.Release|Any CPU.ActiveCfg = DefaultBuild
-		{6E3369AD-6FFE-4A2A-9CD2-ACFA3C1C139D}.Release|Any CPU.Build.0 = DefaultBuild
-		{6E3369AD-6FFE-4A2A-9CD2-ACFA3C1C139D}.ReleaseOLA|Any CPU.ActiveCfg = DefaultBuild
-		{6E3369AD-6FFE-4A2A-9CD2-ACFA3C1C139D}.ReleaseOLA|Any CPU.Build.0 = DefaultBuild
-		{6E3369AD-6FFE-4A2A-9CD2-ACFA3C1C139D}.ReleaseOS|Any CPU.ActiveCfg = DefaultBuild
-		{6E3369AD-6FFE-4A2A-9CD2-ACFA3C1C139D}.ReleaseOS|Any CPU.Build.0 = DefaultBuild
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

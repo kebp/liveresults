@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 //  K.Roberts   KR  May 2023    Modified to support position in results for WOC2024. 
+//  K.Roberts   KR  Sep 2023    Determine if only result position has changed i.e. not time or status
 
 namespace LiveResults.Model
 {
@@ -133,6 +134,7 @@ namespace LiveResults.Model
         public bool RunnerUpdated;
         public bool ResultUpdated;
         public bool StartTimeUpdated;
+        public bool PositionUpdated;        // KR: to track when position changes
 
         private readonly Dictionary<int, SplitTime> m_splitTimes;
         public Runner(int dbID, string name, string club, string Class, string sourceId = null, string bib = null)
@@ -140,6 +142,7 @@ namespace LiveResults.Model
             RunnerUpdated = true;
             ResultUpdated = false;
             StartTimeUpdated = false;
+            PositionUpdated = false;        // KR
 
             m_splitTimes = new Dictionary<int, SplitTime>();
             m_id = dbID;
@@ -327,10 +330,11 @@ namespace LiveResults.Model
         {
             if (HasResultChanged(time, status, position))
             {
+                ResultUpdated = m_time != time || m_status != status;           // KR
+                PositionUpdated = m_position != position;                       // KR
                 m_time = time;
                 m_position = position;
                 m_status = status;
-                ResultUpdated = true;
             }
         }
 

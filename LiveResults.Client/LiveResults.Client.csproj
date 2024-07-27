@@ -157,6 +157,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BuildInfo.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>BuildInfo.tt</DependentUpon>
+    </Compile>
     <Compile Include="FrmNewRacomComp.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -373,6 +378,10 @@
     <None Include="Resources\iof_logohead.png" />
     <None Include="Resources\iof_logohead1.png" />
     <None Include="Resources\ssftiming.png" />
+    <Content Include="BuildInfo.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>BuildInfo.cs</LastGenOutput>
+    </Content>
     <Content Include="Resources\LiveResults.ico" />
     <Content Include="Wizard\Wizard.bmp" />
     <Content Include="Wizard\wizBigOnlineFolder.gif" />
@@ -386,6 +395,9 @@
       <Project>{90078189-7b0a-4c17-bcda-b1f9e564fc5e}</Project>
       <Name>LiveResults.Model</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
