@@ -7,6 +7,7 @@ if (count($comp) == 0) {
     exit;
 }
 
+$hdr = Emma::GetHeader($_GET['compid']);
 $rcontrols = Emma::GetRadioControls($_GET['compid']);
 $stats = Emma::GetCompetitionStats($_GET['compid']);
 
@@ -34,6 +35,12 @@ if (isset($_GET['what'])) {
       break;
     case "drs":
       Emma::DelRunAndRes($_GET['compid']);
+      break;
+    case "hdr":
+      Emma::SetHeader($_GET['compid'],$_POST['foreground'],$_POST['background'],$_POST['url'],$_POST['url2']);
+      break;
+    case "logo":
+      Emma::UploadLogo($_GET['compid'],$_FILES['fileToUpload']);
       break;
   }
 }
@@ -209,6 +216,38 @@ function confirmDelAllRadio() {
 <b>Show tenths second</b>
 <input type="checkbox" name="tenths" <?= $comp['tenths'] == 1 ? "checked" : "" ?>/><br/><br/>
 <input type="submit" name="btnSave" class="btn btn-primary" value="Save"/>
+</form>
+
+<br><h1 class="categoriesheader">Header markup</h1>
+<p>Header settings are all otional, but useful if you have majore event branding. Defaults are all sensible</p>
+<form name="header" action="editComp.php?what=hdr&compid=<?=$comp['tavid']?>" method="post">
+<div>
+  <b><label for="foreground">Foreground color</label></b>
+  <select id="foreground" name="foreground">
+    <option <?php if ($hdr['fg'] == 'navbar-dark') echo 'selected = "selected"'; ?> value="navbar-dark">Light text</option>
+    <option <?php if ($hdr['fg'] == 'navbar-light') echo 'selected = "selected"'; ?> value="navbar-light">Dark text</option>
+  </select>
+</div>
+<div>
+  <b><label for="background">Background color</label></b>
+  <input type="color" id="background" name="background" value="<?=$hdr['bg']?>" />
+</div>
+<div>
+  <b>Logo: </b><?=$hdr['logoname']?><br/>
+  <b><label for="url">URL for logo</label></b>
+  <input type="url" name="url" size="35" value="<?=$hdr['url']?>" /><br/>
+  <b><label for="url">URL for menu Home</label></b>
+  <input type="url2" name="url2" size="35" value="<?=$hdr['url2']?>" /><br/>
+  <input type="submit" name="btnHdr" class="btn btn-primary" value="Save"/>
+</div>
+</form>
+</br>
+<p>Optionally upload an event or club logo for the event.
+Should be in SVG format and &lt; 50k in size.</p>
+<form action="editComp.php?what=logo&compid=<?=$comp['tavid']?>" method="post" enctype="multipart/form-data">
+  <b><label for="fileToUpload">Select image to upload</label></b>
+  <input type="file" name="fileToUpload" id="fileToUpload"></br>
+  <input type="submit" value="Upload Logo" name="btnLogo"  class="btn btn-primary">
 </form>
 
 <!-- Event deletion functions -->

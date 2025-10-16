@@ -13,6 +13,7 @@ include_once("templates/classEmma.class.php");
 header('Content-Type: text/html; charset='.$CHARSET);
 
 $currentComp = new Emma($_GET['comp']);
+$header = Emma::GetHeader($_GET['comp']);
 
 $isSingleClass = isset($_GET['class']);
 $isSingleClub = isset($_GET['club']);
@@ -190,10 +191,10 @@ $(document).ready(function()
 <!-- MAIN DIV -->
 
 <?php if (!$isSingleClass && !$isSingleClub && $showPath) {?>
-<nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #0f2170;">
+<nav class="navbar navbar-expand-lg <?=$header['fg']?>" style="background-color: <?=$header['bg']?>; color: <?=$header['fg']?>;">
   <div class="container-fluid">
-  <a class="navbar-brand" href="https://results.woc2024.org">
-    <img src="images/logo.svg" alt="WOC2024 logo" width="200" height="60" class="d-inline-block align-text-top">
+  <a class="navbar-brand" href="<?=$header['url']?>">
+  <img src="logos/<?=$header['logo']?>" alt="Event logo" width="200" height="60" class="d-inline-block align-text-top">
   </a>
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -202,7 +203,7 @@ $(document).ready(function()
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="/woc">Home</a>
+        <a class="nav-link active" aria-current="page" href="<?=$header['url2']?>">Home</a>
         </li>
         <li class="nav-item">
           <span id="setAutomaticUpdateText">
@@ -273,7 +274,7 @@ $(document).ready(function()
 </div>
 </nav>
 
-<nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #0f2170;">
+<nav class="navbar navbar-expand-lg <?=$header['fg']?>" style="background-color: <?=$header['bg']?>">
   <div class="container-fluid">
     <span class="navbar-brand mb-0 h1"><?=$currentComp->CompName()?> &#8210; <?=$currentComp->CompDate()?></span>
 

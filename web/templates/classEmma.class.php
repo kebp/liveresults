@@ -107,48 +107,45 @@ public static function GetCompetitionStats($compid) {
 }
 
 
-public static function DelRadioControl($compid,$code,$classname)
-
-        {
-        $conn = self::openConnection();
-
-	 mysqli_query($conn, "delete from splitcontrols where tavid=$compid and code=$code and classname='$classname'");
-
-        }
+public static function DelRadioControl($compid,$code,$classname) {
+    $conn = self::openConnection();
+    mysqli_query($conn, "delete from splitcontrols where tavid=$compid and code=$code and classname='$classname'");
+}
 
 public static function DelAllRadioControls($compid) {
     $conn = self::openConnection();
     mysqli_query($conn, "delete from splitcontrols where tavid=$compid");
 }
 
-
 public static function DelEvent($compid) {
     $conn = self::openConnection();
     mysqli_query($conn, "delete from login where tavid=$compid");
 }    
-
 
 public static function DelRunAndRes($compid) {
     $conn = self::openConnection();
     mysqli_query($conn, "delete from runners where tavid=$compid");
 }
 
-	public static function CreateCompetition($name,$org,$date,$tenths)
-        {
-        $conn = self::openConnection();
-	 $res = mysqli_query($conn, "select max(tavid)+1 from login");
-	 list($id) = mysqli_fetch_row($res);
-	if ($id < 10000)
-		$id = 10000;
-        if (isset($tenths))
-          $tenthValue = 1;
-        else
-          $tenthValue = 0;
-
-
-	 mysqli_query($conn, "insert into login(tavid,user,pass,compName,organizer,compDate,public,tenths) values(".$id.",'".md5($name.$org.$date)."','".md5("liveresultat")."','".$name."','".$org."','".$date."',0,'".$tenthValue."')") or die(mysqli_error($conn));
-
-	}
+public static function CreateCompetition($name,$org,$date,$tenths) {
+    $conn = self::openConnection();
+    $res = mysqli_query($conn, "select max(tavid)+1 from login");
+    list($id) = mysqli_fetch_row($res);
+    if ($id < 10000)
+	$id = 10000;
+    if (isset($tenths))
+        $tenthValue = 1;
+    else
+        $tenthValue = 0;
+    mysqli_begin_transaction($conn);
+    $q1 = mysqli_query($conn, "insert into login(tavid,user,pass,compName,organizer,compDate,public,tenths) values(".$id.",'".md5($name.$org.$date)."','".md5("liveresultat")."','".$name."','".$org."','".$date."',0,'".$tenthValue."')");
+    $q2 = mysqli_query($conn, "insert into header(tavid,fg,bg,url,url2,logo,logoname) values('".$id."','navbar-dark','#0f2170', '/', '/index.php', 'liveoresults.svg', 'liveoresults.svg')");
+    if ($q1 && $q2) {
+      mysqli_commit($conn);
+    } else {
+      mysqli_rollback($conn);
+    };
+}
 
 	public static function CreateCompetitionFull($name,$org,$date, $email, $password, $country)
     	{
@@ -231,6 +228,85 @@ public static function UpdateCompetition($id,$name,$org,$date,$tenths,$public,$t
 
         }
 
+public static function GetHeader($compid) {
+     $conn = self::openConnection();
+     $result = mysqli_query($conn, "select fg, bg, logo, url, url2, logoname from header where tavid=$compid");
+     $ret = null;
+     while ($tmp = mysqli_fetch_array($result)) {
+       $ret = $tmp;
+     }
+     mysqli_free_result($result);
+     return $ret;
+}
+
+public static function SetHeader($compid,$fg,$bg,$url,$url2) {
+    $conn = self::openConnection();
+    $sql = "update header set fg='$fg', bg='$bg', url='$url', url2='$url2'  where tavid=$compid";
+    mysqli_query($conn, $sql) or die(mysqli_error($conn));
+}
+
+public static function UploadLogo($compid,$file) {
+  $destination = "../logos/";
+  //$target_file = "../logos/" . basename($file["name"]);
+  $filename = basename($file["name"]);
+  $uploadOk = 1;
+  $imageFileType = strtolower(pathinfo($destination . $filename,PATHINFO_EXTENSION));
+
+  // Check if image file is a actual image or fake image
+  if (is_uploaded_file($file['tmp_name'])) {
+    $check = getimagesize($file["tmp_name"]);
+    if($check !== false or $imageFileType == "svg") {
+      $uploadOk = 1;
+    } else if ($imageFileType == "svg") {
+      $uploadOk = 1;
+    } else {
+      echo '<script>alert("File is not an image.")</script>';
+      $uploadOk = 0;
+    }
+  }
+
+  // Check file size < 50k
+  if ($uploadOk == 1 && $file["size"] > 50000) {
+    echo '<script>alert("Sorry, your file is too large.")</script>';
+    $uploadOk = 0;
+  }
+
+  // Only allow SVG, JPEG, PNG file formats
+  $allowed_file_types = ['image/png', 'image/jpeg', 'image/svg+xml'];
+  $mime_type = mime_content_type($file['tmp_name']);
+  if (! in_array($mime_type, $allowed_file_types)) {
+    $uploadOk = 0;
+    echo '<script>alert("Your file does not have an allowed format: "'.$mime_type.')</script>';
+  } else {
+    switch ($mime_type) {
+      case "image/png":
+        $extn = ".png";
+        break;
+      case "image/jpeg":
+        $extn = ".jpg";
+        break;
+      case "image/svg+xml":
+        $extn= ".svg";
+        break;
+    }
+  }
+
+  // Check if $uploadOk is set to 0 by an error
+  if ($uploadOk == 1) {
+    $savename = md5($compid.$filename) . $extn;
+    // Record savename associated with event.
+    $conn = self::openConnection();
+    $result = mysqli_query($conn, "select compName from login where tavid = '".$compid."' ") or die(mysqli_error($conn));
+    $compName = mysqli_fetch_row($result);
+    mysqli_query($conn, "update header set logo = '".md5($compid.$compName).$extn."', logoname = '".$filename."' where tavid =  '".$compid."'") or die(mysqli_error($conn));
+
+    if (move_uploaded_file($file["tmp_name"], $destination.md5($compid.$compName).$extn)) {
+      echo '<script>alert("The file ". htmlspecialchars( basename( $file["name"])). " has been uploaded.")</script>';
+    } else {
+      echo '<script>alert("Sorry, there was an error uploading your file.")</script>';
+    }
+  }
+}
 
 	function __construct($compID)
 
