@@ -1,116 +1,107 @@
 <?php
 
-$_TITLE = "Резултати";
+$_TITLE = 'Резултати';
 
-$_CHOOSECMP = "Избор на състезание";
+$_CHOOSECMP = 'Избор на състезание';
 
-$_AUTOUPDATE = "Automatic update";
+$_AUTOUPDATE = 'Automatic update';
 
-$_UP15SEK = "На всеки 15 секунди";
+$_UP15SEK = 'На всеки 15 секунди';
 
-$_UP30SEK = "Два пъти в минута";
+$_UP30SEK = 'Два пъти в минута';
 
-$_UP60SEK = "Веднъж в минута";
+$_UP60SEK = 'Веднъж в минута';
 
-$_UP120SEK = "На всеки две минути";
+$_UP120SEK = 'На всеки две минути';
 
-$_UPNEVER = "Никога";
+$_UPNEVER = 'Никога';
 
+$_LASTPASSINGS = 'Последно обновени';
 
+$_LASTPASSFINISHED = 'финиширал';
 
-$_LASTPASSINGS="Последно обновени";
+$_LASTPASSPASSED = 'преминал';
 
-$_LASTPASSFINISHED="финиширал";
+$_LASTPASSWITHTIME = 'с време';
 
-$_LASTPASSPASSED="преминал";
+$_CHOOSECLASS = 'Избор на група';
 
-$_LASTPASSWITHTIME="с време";
+$_NOCLASSESYET = 'Не са дефинирани групи';
 
-$_CHOOSECLASS="Избор на група";
+$_CONTROLFINISH = 'Финал';
 
-$_NOCLASSESYET="Не са дефинирани групи";
+$_NAME = 'Име';
 
-$_CONTROLFINISH="Финал";
+$_CLUB = 'Клуб';
+$_NATION = 'Националност';
 
-$_NAME="Име";
+$_TIME = 'Време';
 
-$_CLUB="Клуб";
-$_NATION = "Националност";
+$_NOCLASSCHOSEN = 'Няма избрана група!';
 
-$_TIME="Време";
+$_HELPREDRESULTS = 'Резултатите от последните две минути са в червено';
 
-$_NOCLASSCHOSEN="Няма избрана група!";
+$_NOTICE = 'Резултатите на тази страница не са официални. За официалните резултати посетете страницата на организатора.';
 
-$_HELPREDRESULTS="Резултатите от последните две минути са в червено";
+$_STATUSDNS = 'dns';
 
-$_NOTICE="Резултатите на тази страница не са официални. За официалните резултати посетете страницата на организатора.";
+$_STATUSDNF = 'dnf';
 
-$_STATUSDNS = "dns";
+$_STATUSWO = 'dns';
 
-$_STATUSDNF = "dnf";
+$_STATUSMOVEDUP = 'moved up';
 
-$_STATUSWO = "dns";
+$_STATUSNOTSTARTED = 'not started';
 
-$_STATUSMOVEDUP = "moved up";
+$_STATUSOK = 'Passed';
 
-$_STATUSNOTSTARTED="not started";
+$_STATUSMP = 'mp';
 
-$_STATUSOK = "Passed";
+$_STATUSDSQ = 'disq';
 
-$_STATUSMP = "mp";
+$_STATUSOT = 'ot';
 
-$_STATUSDSQ= "disq";
+$_FIRSTPAGECHOOSE = 'Избор на състезание за проследяване';
 
-$_STATUSOT="ot";
+$_FIRSTPAGEARCHIVE = 'Архив';
 
-
-
-$_FIRSTPAGECHOOSE = "Избор на състезание за проследяване";
-
-$_FIRSTPAGEARCHIVE = "Архив";
-
-$_FIRSTPAGELIVE = "На живо";
-
-
+$_FIRSTPAGELIVE = 'На живо';
 
 //new 2.0
 
-$_LOADINGRESULTS = "Зарежда резултати...";
+$_LOADINGRESULTS = 'Зарежда резултати...';
 
-$_ON = "Вкл";
+$_ON = 'Вкл';
 
-$_OFF = "Изкл";
+$_OFF = 'Изкл';
 
-$_TEXTSIZE = "Текст";
+$_TEXTSIZE = 'Текст';
 
-$_LARGER = "голям";
+$_LARGER = 'голям';
 
-$_SMALLER = "малък";
+$_SMALLER = 'малък';
 
-$_OPENINNEW = "В друг прозорец";
+$_OPENINNEW = 'В друг прозорец';
 
-$_FORORGANIZERS = "Информация за организатори";
+$_FORORGANIZERS = 'Информация за организатори';
 
-$_FORDEVELOPERS = "Информация за разработчици(api)";
+$_FORDEVELOPERS = 'Информация за разработчици(api)';
 
-$_RESETTODEFAULT = "Сортиране по подразбиране";
+$_RESETTODEFAULT = 'Сортиране по подразбиране';
 
-$_OPENINNEWWINDOW = "Отваря в нов прозорец";
+$_OPENINNEWWINDOW = 'Отваря в нов прозорец';
 
-$_INSTRUCTIONSHELP = "Инструкции/помощ";
+$_INSTRUCTIONSHELP = 'Инструкции/помощ';
 
-$_LOADINGCLASSES = "Зарежда групи...";
+$_LOADINGCLASSES = 'Зарежда групи...';
 
-$_START = "Старт";
+$_START = 'Старт';
 
-$_TOTAL = "Тотал";
+$_TOTAL = 'Тотал';
 
-$_CLASS = "Група";
-
+$_CLASS = 'Група';
 
 // 2.1
-$_ORGANIZER = "Организатор";
-$_DATE = "Дата";
-$_EVENTNAME = "Име";
-
-?>
+$_ORGANIZER = 'Организатор';
+$_DATE = 'Дата';
+$_EVENTNAME = 'Име';

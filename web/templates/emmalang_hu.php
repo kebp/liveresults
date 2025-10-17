@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 //Language-ressource file: Hungarian = Magyar
 //translated by Rainer Burmann, some tweaking by Simon Harston
 
@@ -6,118 +6,109 @@
 //Namn = Verseny neve
 //Arrangör = Rendezõ
 
-$_TITLE = "Élõ eredmény";
+$_TITLE = 'Élõ eredmény';
 
-$_CHOOSECMP = "Verseny kiválasztása";
+$_CHOOSECMP = 'Verseny kiválasztása';
 
-$_AUTOUPDATE = "Automatikus frisítés";
+$_AUTOUPDATE = 'Automatikus frisítés';
 
-$_UP15SEK = "15 másodpercenként";
+$_UP15SEK = '15 másodpercenként';
 
-$_UP30SEK = "Fél percenként";
+$_UP30SEK = 'Fél percenként';
 
-$_UP60SEK = "Percenként";
+$_UP60SEK = 'Percenként';
 
-$_UP120SEK = "Két percenként";
+$_UP120SEK = 'Két percenként';
 
-$_UPNEVER = "Soha";
+$_UPNEVER = 'Soha';
 
+$_LASTPASSINGS = 'Utolsó események';
 
+$_LASTPASSFINISHED = 'befutott';
 
-$_LASTPASSINGS="Utolsó események";
+$_LASTPASSPASSED = 'átfutott:';
 
-$_LASTPASSFINISHED="befutott";
+$_LASTPASSWITHTIME = ', ideje:';
 
-$_LASTPASSPASSED="átfutott:";
+$_CHOOSECLASS = 'Kategória választás';
 
-$_LASTPASSWITHTIME=", ideje:";
+$_NOCLASSESYET = 'Nincsenek megadva kategóriák';
 
-$_CHOOSECLASS="Kategória választás";
+$_CONTROLFINISH = 'Cél';
 
-$_NOCLASSESYET="Nincsenek megadva kategóriák";
+$_NAME = 'Név';
 
-$_CONTROLFINISH="Cél";
+$_CLUB = 'Klub';
 
-$_NAME="Név";
+$_NATION = 'Ország';
 
-$_CLUB="Klub";
-$_NATION = "Ország";
+$_TIME = 'Idõ';
 
-$_TIME="Idõ";
+$_NOCLASSCHOSEN = 'Nincs kiválasztva kategória!';
 
-$_NOCLASSCHOSEN="Nincs kiválasztva kategória!";
+$_HELPREDRESULTS = 'Az utolsó két percben változott eredmények piros háttérrel látszanak';
 
-$_HELPREDRESULTS="Az utolsó két percben változott eredmények piros háttérrel látszanak";
+$_NOTICE = 'Az itt közölt eremények nem hivatalosak. A hivatalos eredményekért látogasd meg a rendezõ honlapját.';
 
-$_NOTICE="Az itt közölt eremények nem hivatalosak. A hivatalos eredményekért látogasd meg a rendezõ honlapját.";
+$_STATUSDNS = 'n.i.';
 
-$_STATUSDNS = "n.i.";
+$_STATUSDNF = 'nfb';
 
-$_STATUSDNF = "nfb";
+$_STATUSWO = 'n.i.';
 
-$_STATUSWO = "n.i.";
+$_STATUSMOVEDUP = 'feljebb került';
 
-$_STATUSMOVEDUP = "feljebb került";
+$_STATUSNOTSTARTED = 'nem indult';
 
-$_STATUSNOTSTARTED="nem indult";
+$_STATUSOK = 'Átfutott';
 
-$_STATUSOK = "Átfutott";
+$_STATUSMP = 'hiba';
 
-$_STATUSMP = "hiba";
+$_STATUSDSQ = 'disq';
 
-$_STATUSDSQ= "disq";
+$_STATUSOT = 'v.i.';
 
-$_STATUSOT="v.i.";
+$_FIRSTPAGECHOOSE = 'Verseny kiválasztása';
 
+$_FIRSTPAGEARCHIVE = 'Archív';
 
-
-$_FIRSTPAGECHOOSE = "Verseny kiválasztása";
-
-$_FIRSTPAGEARCHIVE = "Archív";
-
-$_FIRSTPAGELIVE = "Élõ";
-
-
+$_FIRSTPAGELIVE = 'Élõ';
 
 //new 2.0
 
-$_LOADINGRESULTS = "Eredmények betöltése...";
+$_LOADINGRESULTS = 'Eredmények betöltése...';
 
-$_ON = "Be";
+$_ON = 'Be';
 
-$_OFF = "Ki";
+$_OFF = 'Ki';
 
-$_TEXTSIZE = "Betûméret";
+$_TEXTSIZE = 'Betûméret';
 
-$_LARGER = "nagyobb";
+$_LARGER = 'nagyobb';
 
-$_SMALLER = "kisebb";
+$_SMALLER = 'kisebb';
 
-$_OPENINNEW = "Megnyitás új ablakban";
+$_OPENINNEW = 'Megnyitás új ablakban';
 
-$_FORORGANIZERS = "Információk rendezõknek";
+$_FORORGANIZERS = 'Információk rendezõknek';
 
-$_FORDEVELOPERS = "Információk fejlesztõknek (api)";
+$_FORDEVELOPERS = 'Információk fejlesztõknek (api)';
 
-$_RESETTODEFAULT = "Vissza alap rendezésre";
+$_RESETTODEFAULT = 'Vissza alap rendezésre';
 
-$_OPENINNEWWINDOW = "Megnyitás új ablakban";
+$_OPENINNEWWINDOW = 'Megnyitás új ablakban';
 
-$_INSTRUCTIONSHELP = "Súgó";
+$_INSTRUCTIONSHELP = 'Súgó';
 
-$_LOADINGCLASSES = "Kategóriák betöltése...";
+$_LOADINGCLASSES = 'Kategóriák betöltése...';
 
-$_START = "Rajt";
+$_START = 'Rajt';
 
-$_TOTAL = "Össz";
+$_TOTAL = 'Össz';
 
-$_CLASS = "Kateg";
-
+$_CLASS = 'Kateg';
 
 // 2.1
-$_ORGANIZER = "Rendezõ";
-$_DATE = "Dátum";
-$_EVENTNAME = "Név";
-
-
-?>
+$_ORGANIZER = 'Rendezõ';
+$_DATE = 'Dátum';
+$_EVENTNAME = 'Név';

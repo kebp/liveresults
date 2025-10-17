@@ -1,32 +1,23 @@
 <?php
-include_once("../templates/classEmma.class.php");
+include_once '../templates/classEmma.class.php';
 
-if (isset($_POST['btnSubmit']))
-{
-	Emma::CreateCompetition($_POST['name'],$_POST['org'],$_POST['date'],$_POST['tenths']);
-	header("Location: admincompetitions.php");
-	exit;
+if (isset($_POST['btnSubmit'])) {
+    Emma::CreateCompetition($_POST['name'], $_POST['org'], $_POST['date'], $_POST['tenths']);
+    header('Location: admincompetitions.php');
+    exit();
 }
 
+include_once '../templates/emmalang_en.php';
 
-include_once("../templates/emmalang_en.php");
+$lang = 'en';
 
-   $lang = "en";
+if (isset($_GET['lang']) && $_GET['lang'] != '') {
+    $lang = $_GET['lang'];
+}
 
-   if (isset($_GET['lang']) && $_GET['lang'] != "")
+include_once "../templates/emmalang_$lang.php";
 
-   {
-
-	$lang = $_GET['lang'];
-
-   }
-
-include_once("../templates/emmalang_$lang.php");
-
-
-
-
-header('Content-Type: text/html; charset='.$CHARSET);
+header('Content-Type: text/html; charset=' . $CHARSET);
 
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
@@ -34,11 +25,11 @@ header('Content-Type: text/html; charset='.$CHARSET);
 
 <html>
 
-<head><title><?=$_TITLE?></title>
+<head><title><?= $_TITLE ?></title>
 
 <link rel="stylesheet" type="text/css" href="../css/style-eoc.css">
 <meta name="robots" content="noindex">
-<meta http-equiv="Content-Type" content="text/html;charset=<?=$CHARSET?>">
+<meta http-equiv="Content-Type" content="text/html;charset=<?= $CHARSET ?>">
 
 <script language="javascript">
 
@@ -122,7 +113,7 @@ el.style.backgroundColor = "";
 
              <tr>
               <td><a href="admincompetitions.php">Adminpage Competitionindex</a> | </td>
-               <td><a href="../index.php"><?=$_CHOOSECMP?> to view</a></td>
+               <td><a href="../index.php"><?= $_CHOOSECMP ?> to view</a></td>
 
              </tr>
 

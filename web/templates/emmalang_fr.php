@@ -3,119 +3,108 @@
 //Language-ressource file: French = Français
 //translated by Robert Marique
 
-$_TITLE = "Liveresults";
+$_TITLE = 'Liveresults';
 
-$_CHOOSECMP = "Choisir une compétition";
+$_CHOOSECMP = 'Choisir une compétition';
 
-$_AUTOUPDATE = "Mise à jour automatique";
+$_AUTOUPDATE = 'Mise à jour automatique';
 
-$_UP15SEK = "Toutes les 15 secondes";
+$_UP15SEK = 'Toutes les 15 secondes';
 
-$_UP30SEK = "Deux fois par minute";
+$_UP30SEK = 'Deux fois par minute';
 
-$_UP60SEK = "Une fois par minute";
+$_UP60SEK = 'Une fois par minute';
 
-$_UP120SEK = "Toutes les deux minutes";
+$_UP120SEK = 'Toutes les deux minutes';
 
-$_UPNEVER = "Jamais";
+$_UPNEVER = 'Jamais';
 
+$_LASTPASSINGS = 'Dernières mises à jour';
 
+$_LASTPASSFINISHED = 'a terminé';
 
-$_LASTPASSINGS="Dernières mises à jour";
+$_LASTPASSPASSED = 'a validé';
 
-$_LASTPASSFINISHED="a terminé";
+$_LASTPASSWITHTIME = ', chrono:';
 
-$_LASTPASSPASSED="a validé";
+$_CHOOSECLASS = 'Choisir la catégorie';
 
-$_LASTPASSWITHTIME=", chrono:";
+$_NOCLASSESYET = 'Aucune catégorie définie!';
 
-$_CHOOSECLASS="Choisir la catégorie";
+$_CONTROLFINISH = 'Arrivée';
 
-$_NOCLASSESYET="Aucune catégorie définie!";
+$_NAME = 'Nom';
 
-$_CONTROLFINISH="Arrivée";
+$_CLUB = 'Club';
+$_NATION = 'Pays';
 
-$_NAME="Nom";
+$_TIME = 'Chrono';
 
-$_CLUB="Club";
-$_NATION = "Pays";
+$_NOCLASSCHOSEN = 'Aucune catégorie sélectionnée!';
 
-$_TIME="Chrono";
+$_HELPREDRESULTS = 'Les résultats des deux dernières minutes apparaissent en rouge';
 
-$_NOCLASSCHOSEN="Aucune catégorie sélectionnée!";
+$_NOTICE = "Merci de noter que les résultats de cette page ne sont pas officiels. Pour les résultats officiels, consultez le site web de l'organisation.";
 
-$_HELPREDRESULTS="Les résultats des deux dernières minutes apparaissent en rouge";
+$_STATUSDNS = 'absent';
 
-$_NOTICE="Merci de noter que les résultats de cette page ne sont pas officiels. Pour les résultats officiels, consultez le site web de l'organisation.";
+$_STATUSDNF = 'abandon';
 
+$_STATUSWO = 'absent';
 
+$_STATUSMOVEDUP = 'montant';
 
-$_STATUSDNS = "absent";
+$_STATUSNOTSTARTED = 'non parti';
 
-$_STATUSDNF = "abandon";
+$_STATUSOK = 'OK';
 
-$_STATUSWO = "absent";
+$_STATUSMP = 'pm';
 
-$_STATUSMOVEDUP = "montant";
+$_STATUSDSQ = 'disq';
 
-$_STATUSNOTSTARTED="non parti";
+$_STATUSOT = '&gt; temps maxi';
 
-$_STATUSOK = "OK";
+$_FIRSTPAGECHOOSE = 'Choisir la compétition à suivre';
 
-$_STATUSMP = "pm";
+$_FIRSTPAGEARCHIVE = 'Archive';
 
-$_STATUSDSQ= "disq";
-
-$_STATUSOT="&gt; temps maxi";
-
-
-
-$_FIRSTPAGECHOOSE = "Choisir la compétition à suivre";
-
-$_FIRSTPAGEARCHIVE = "Archive";
-
-$_FIRSTPAGELIVE = "Live";
-
-
+$_FIRSTPAGELIVE = 'Live';
 
 //new 2.0
 
-$_LOADINGRESULTS = "Chargement des résultats...";
+$_LOADINGRESULTS = 'Chargement des résultats...';
 
-$_ON = "On";
+$_ON = 'On';
 
-$_OFF = "Off";
+$_OFF = 'Off';
 
-$_TEXTSIZE = "Taille du texte";
+$_TEXTSIZE = 'Taille du texte';
 
-$_LARGER = "Plus grande";
+$_LARGER = 'Plus grande';
 
-$_SMALLER = "Plus petite";
+$_SMALLER = 'Plus petite';
 
-$_OPENINNEW = "Ouvrir dans une nouvelle fenêtre";
+$_OPENINNEW = 'Ouvrir dans une nouvelle fenêtre';
 
-$_FORORGANIZERS = "Information pour les organisateurs";
+$_FORORGANIZERS = 'Information pour les organisateurs';
 
-$_FORDEVELOPERS = "Information pour les développeurs (api)";
+$_FORDEVELOPERS = 'Information pour les développeurs (api)';
 
-$_RESETTODEFAULT = "Rétablir le tri par défaut";
+$_RESETTODEFAULT = 'Rétablir le tri par défaut';
 
-$_OPENINNEWWINDOW = "Ouvrir dans une nouvelle fenêtre";
+$_OPENINNEWWINDOW = 'Ouvrir dans une nouvelle fenêtre';
 
-$_INSTRUCTIONSHELP = "Instruction / Aide";
+$_INSTRUCTIONSHELP = 'Instruction / Aide';
 
-$_LOADINGCLASSES = "Chargement des catégories...";
+$_LOADINGCLASSES = 'Chargement des catégories...';
 
-$_START = "Départ";
+$_START = 'Départ';
 
-$_TOTAL = "Total";
+$_TOTAL = 'Total';
 
-$_CLASS = "Catégorie";
-
+$_CLASS = 'Catégorie';
 
 // 2.1
-$_ORGANIZER = "Organisateur";
-$_DATE = "Date";
-$_EVENTNAME = "Nom";
-
-?>
+$_ORGANIZER = 'Organisateur';
+$_DATE = 'Date';
+$_EVENTNAME = 'Nom';

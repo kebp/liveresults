@@ -2,839 +2,784 @@
 $CHARSET = 'utf-8';
 class Emma
 {
+    //public static $db_server = "liveresults.cvdrzxhnuzid.eu-west-2.rds.amazonaws.com";
+    public static $db_server = 'localhost';
+    public static $db_database = 'liveresults';
+    public static $db_user = 'liveresults';
+    public static $db_pw = 'w00dh0u2e';
+    public static $MYSQL_CHARSET = 'utf8';
+    var $m_CompId;
 
-	//public static $db_server = "liveresults.cvdrzxhnuzid.eu-west-2.rds.amazonaws.com";
-	public static $db_server = "localhost";
-	public static $db_database = "liveresults";
-	public static $db_user = "liveresults";
-	public static $db_pw= "w00dh0u2e";
-	public static $MYSQL_CHARSET = "utf8";
-	var $m_CompId;
+    var $m_CompName;
 
-   var $m_CompName;
+    var $m_CompDate;
+    var $m_TimeDiff = 0;
+    var $m_Tenths = 0;
+    var $m_IsMultiDayEvent = false;
+    var $m_MultiDayStage = -1;
+    var $m_MultiDayParent = -1;
 
-   var $m_CompDate;
-   var $m_TimeDiff = 0;
-   var $m_Tenths = 0;
-   var $m_IsMultiDayEvent = false;
-   var $m_MultiDayStage = -1;
-   var $m_MultiDayParent = -1;
-   
-	var $m_Conn;
+    var $m_Conn;
 
-	private static function openConnection() {
-		$conn = mysqli_connect(self::$db_server, self::$db_user, self::$db_pw, self::$db_database);
-		if (mysqli_connect_errno()) {
-			printf("Connect failed: %s\n", mysqli_connect_error());
-			exit();
-		}
-		mysqli_set_charset($conn, self::$MYSQL_CHARSET);
-		return $conn;
-	}
-
-public static function GetCompetitions() {
-    $conn = self::openConnection();
-
-    $result = mysqli_query($conn, "select compName, compDate,tavid,organizer,timediff,multidaystage,multidayparent from login where public = 1 order by compDate desc");
-
-    $ret = Array();
-    while ($tmp = mysqli_fetch_array($result)) {
-        $ret[] = $tmp;
+    private static function openConnection()
+    {
+        $conn = mysqli_connect(self::$db_server, self::$db_user, self::$db_pw, self::$db_database);
+        if (mysqli_connect_errno()) {
+            printf("Connect failed: %s\n", mysqli_connect_error());
+            exit();
+        }
+        mysqli_set_charset($conn, self::$MYSQL_CHARSET);
+        return $conn;
     }
 
-    mysqli_free_result($result);
+    public static function GetCompetitions()
+    {
+        $conn = self::openConnection();
 
-    return $ret;
-}
+        $result = mysqli_query(
+            $conn,
+            'select compName, compDate,tavid,organizer,timediff,multidaystage,multidayparent from login where public = 1 order by compDate desc',
+        );
 
-public static function GetCompetitionsToday()
+        $ret = array();
+        while ($tmp = mysqli_fetch_array($result)) {
+            $ret[] = $tmp;
+        }
 
-        {
+        mysqli_free_result($result);
+
+        return $ret;
+    }
+
+    public static function GetCompetitionsToday()
+    {
+        $conn = self::openConnection();
+
+        $result = mysqli_query(
+            $conn,
+            "select compName, compDate,tavid,organizer,timediff,multidaystage,multidayparent from login where public = 1 and compDate = '"
+            . date('Y-m-d')
+            . "'",
+        );
+
+        $ret = array();
+
+        while ($tmp = mysqli_fetch_array($result)) {
+            $ret[] = $tmp;
+        }
+
+        mysqli_free_result($result);
+
+        return $ret;
+    }
+
+    public static function GetRadioControls($compid)
+    {
+        $conn = self::openConnection();
+
+        $result = mysqli_query($conn, "select * from splitcontrols where tavid=$compid order by corder");
+
+        $ret = array();
+
+        while ($tmp = mysqli_fetch_array($result)) {
+            $ret[] = $tmp;
+        }
+
+        mysqli_free_result($result);
+
+        return $ret;
+    }
+
+    public static function GetCompetitionStats($compid)
+    {
+        $conn = self::openConnection();
+        $result = mysqli_query(
+            $conn,
+            "select count(distinct class) as Classes, count(name) as Names from runners where tavid=$compid",
+        );
+        $ret = null;
+        while ($tmp = mysqli_fetch_array($result)) {
+            $ret = $tmp;
+        }
+        mysqli_free_result($result);
+        return $ret;
+    }
+
+    public static function DelRadioControl($compid, $code, $classname)
+    {
+        $conn = self::openConnection();
+        mysqli_query($conn, "delete from splitcontrols where tavid=$compid and code=$code and classname='$classname'");
+    }
+
+    public static function DelAllRadioControls($compid)
+    {
+        $conn = self::openConnection();
+        mysqli_query($conn, "delete from splitcontrols where tavid=$compid");
+    }
+
+    public static function DelEvent($compid)
+    {
+        $conn = self::openConnection();
+        mysqli_query($conn, "delete from login where tavid=$compid");
+    }
+
+    public static function DelRunAndRes($compid)
+    {
+        $conn = self::openConnection();
+        mysqli_query($conn, "delete from runners where tavid=$compid");
+    }
+
+    public static function CreateCompetition($name, $org, $date, $tenths)
+    {
+        $conn = self::openConnection();
+        $res = mysqli_query($conn, 'select max(tavid)+1 from login');
+        list($id) = mysqli_fetch_row($res);
+        if ($id < 10000)
+            $id = 10000;
+        if (isset($tenths))
+            $tenthValue = 1;
+        else
+            $tenthValue = 0;
+        mysqli_begin_transaction($conn);
+        $q1 = mysqli_query(
+            $conn,
+            'insert into login(tavid,user,pass,compName,organizer,compDate,public,tenths) values('
+            . $id
+            . ",'"
+            . md5($name . $org . $date)
+            . "','"
+            . md5('liveresultat')
+            . "','"
+            . $name
+            . "','"
+            . $org
+            . "','"
+            . $date
+            . "',0,'"
+            . $tenthValue
+            . "')",
+        );
+        $q2 = mysqli_query(
+            $conn,
+            "insert into header(tavid,fg,bg,url,url2,logo,logoname) values('"
+            . $id
+            . "','navbar-dark','#0f2170', '/', '/index.php', 'liveoresults.svg', 'liveoresults.svg')",
+        );
+        if ($q1 && $q2) {
+            mysqli_commit($conn);
+        } else {
+            mysqli_rollback($conn);
+        }
+        ;
+    }
+
+    public static function CreateCompetitionFull($name, $org, $date, $email, $password, $country)
+    {
+        $conn = self::openConnection();
+        $res = mysqli_query($conn, 'select max(tavid)+1 from login');
+        list($id) = mysqli_fetch_row($res);
+        if ($id < 10000)
+            $id = 10000;
+
+        mysqli_query(
+                $conn,
+                'insert into login(tavid,user,pass,compName,organizer,compDate,public, country) values('
+                . $id
+                . ",'"
+                . $email
+                . "','"
+                . md5($password)
+                . "','"
+                . $name
+                . "','"
+                . $org
+                . "','"
+                . $date
+                . "',0,'"
+                . $country
+                . "')",
+            ) or die(mysqli_error($conn));
+        return $id;
+    }
+
+    public static function AddRadioControl($compid, $classname, $name, $code)
+    {
+        $conn = self::openConnection();
+        $res = mysqli_query(
+            $conn,
+            "select count(*)+1 from splitcontrols where classname='$classname' and tavid=$compid",
+        );
+        list($id) = mysqli_fetch_row($res);
+
+        mysqli_query(
+                $conn,
+                "insert into splitcontrols(tavid,classname,name,code,corder) values($compid,'$classname','$name',$code,$id)",
+            ) or die(mysqli_error($conn));
+    }
+
+    public static function UpdateCompetition($id, $name, $org, $date, $tenths, $public, $timediff)
+    {
+        $conn = self::openConnection();
+        $sql =
+            "update login set compName = '$name', organizer='$org', compDate ='$date',timediff=$timediff, tenths="
+            . (!isset($tenths) ? '0' : '1')
+            . ', public='
+            . (!isset($public) ? '0' : '1')
+            . " where tavid=$id";
+
+        mysqli_query($conn, $sql) or die(mysqli_error($conn));
+    }
+
+    public static function GetAllCompetitions()
+    {
+        $conn = self::openConnection();
+
+        $result = mysqli_query(
+            $conn,
+            'select compName, compDate,tavid,timediff,organizer,public from login order by compDate desc',
+        );
+
+        $ret = array();
+
+        while ($tmp = mysqli_fetch_array($result)) {
+            $ret[] = $tmp;
+        }
+
+        mysqli_free_result($result);
+
+        return $ret;
+    }
+
+    public static function GetCompetition($compid)
+    {
+        $conn = self::openConnection();
+
+        $result = mysqli_query(
+            $conn,
+            "select compName, compDate,tavid,organizer,public,tenths,timediff, timezone, multidaystage,multidayparent from login where tavid=$compid",
+        );
+
+        $ret = null;
+
+        while ($tmp = mysqli_fetch_array($result)) {
+            $ret = $tmp;
+        }
+
+        mysqli_free_result($result);
+
+        return $ret;
+    }
+
+    public static function GetHeader($compid)
+    {
+        $conn = self::openConnection();
+        $result = mysqli_query($conn, "select fg, bg, logo, url, url2, logoname from header where tavid=$compid");
+        $ret = null;
+        while ($tmp = mysqli_fetch_array($result)) {
+            $ret = $tmp;
+        }
+        mysqli_free_result($result);
+        return $ret;
+    }
+
+    public static function SetHeader($compid, $fg, $bg, $url, $url2)
+    {
+        $conn = self::openConnection();
+        $sql = "update header set fg='$fg', bg='$bg', url='$url', url2='$url2'  where tavid=$compid";
+        mysqli_query($conn, $sql) or die(mysqli_error($conn));
+    }
+
+    public static function UploadLogo($compid, $file)
+    {
+        $destination = '../logos/';
+        //$target_file = "../logos/" . basename($file["name"]);
+        $filename = basename($file['name']);
+        $uploadOk = 1;
+        $imageFileType = strtolower(pathinfo($destination . $filename, PATHINFO_EXTENSION));
+
+        // Check if image file is a actual image or fake image
+        if (is_uploaded_file($file['tmp_name'])) {
+            $check = getimagesize($file['tmp_name']);
+            if ($check !== false or $imageFileType == 'svg') {
+                $uploadOk = 1;
+            } else if ($imageFileType == 'svg') {
+                $uploadOk = 1;
+            } else {
+                echo '<script>alert("File is not an image.")</script>';
+                $uploadOk = 0;
+            }
+        }
+
+        // Check file size < 50k
+        if ($uploadOk == 1 && $file['size'] > 50000) {
+            echo '<script>alert("Sorry, your file is too large.")</script>';
+            $uploadOk = 0;
+        }
+
+        // Only allow SVG, JPEG, PNG file formats
+        $allowed_file_types = ['image/png', 'image/jpeg', 'image/svg+xml'];
+        $mime_type = mime_content_type($file['tmp_name']);
+        if (!in_array($mime_type, $allowed_file_types)) {
+            $uploadOk = 0;
+            echo '<script>alert("Your file does not have an allowed format: "' . $mime_type . ')</script>';
+        } else {
+            switch ($mime_type) {
+                case 'image/png':
+                    $extn = '.png';
+                    break;
+                case 'image/jpeg':
+                    $extn = '.jpg';
+                    break;
+                case 'image/svg+xml':
+                    $extn = '.svg';
+                    break;
+            }
+        }
+
+        // Check if $uploadOk is set to 0 by an error
+        if ($uploadOk == 1) {
+            $savename = md5($compid . $filename) . $extn;
+            // Record savename associated with event.
             $conn = self::openConnection();
+            ($result = mysqli_query($conn, "select compName from login where tavid = '" . $compid . "' "))
+                or die(mysqli_error($conn));
+            $compName = mysqli_fetch_row($result);
+            mysqli_query(
+                    $conn,
+                    "update header set logo = '"
+                    . md5($compid . $compName)
+                    . $extn
+                    . "', logoname = '"
+                    . $filename
+                    . "' where tavid =  '"
+                    . $compid
+                    . "'",
+                ) or die(mysqli_error($conn));
 
-	 $result = mysqli_query($conn, "select compName, compDate,tavid,organizer,timediff,multidaystage,multidayparent from login where public = 1 and compDate = '".date("Y-m-d")."'");
-
-         $ret = Array();
-
-         while ($tmp = mysqli_fetch_array($result))
-
-	 {
-
- 		$ret[] = $tmp;
-
-         }
-
-		mysqli_free_result($result);
-
- 	return $ret;
-
+            if (move_uploaded_file($file['tmp_name'], $destination . md5($compid . $compName) . $extn)) {
+                echo
+                    '<script>alert("The file ". htmlspecialchars( basename( $file["name"])). " has been uploaded.")</script>'
+                ;
+            } else {
+                echo '<script>alert("Sorry, there was an error uploading your file.")</script>';
+            }
         }
-
-
-
-public static function GetRadioControls($compid)
-
-        {
-            $conn = self::openConnection();
-
-	 $result = mysqli_query($conn, "select * from splitcontrols where tavid=$compid order by corder");
-
-         $ret = Array();
-
-         while ($tmp = mysqli_fetch_array($result))
-
-	 {
-
- 		$ret[] = $tmp;
-
-         }
-
-		mysqli_free_result($result);
-
- 	return $ret;
-
-        }
-
-public static function GetCompetitionStats($compid) {
-  $conn = self::openConnection();
-  $result = mysqli_query($conn, "select count(distinct class) as Classes, count(name) as Names from runners where tavid=$compid");
-  $ret = null;
-  while ($tmp = mysqli_fetch_array($result)) {
-    $ret = $tmp;
-  }
-  mysqli_free_result($result);
-  return $ret;
-}
-
-
-public static function DelRadioControl($compid,$code,$classname) {
-    $conn = self::openConnection();
-    mysqli_query($conn, "delete from splitcontrols where tavid=$compid and code=$code and classname='$classname'");
-}
-
-public static function DelAllRadioControls($compid) {
-    $conn = self::openConnection();
-    mysqli_query($conn, "delete from splitcontrols where tavid=$compid");
-}
-
-public static function DelEvent($compid) {
-    $conn = self::openConnection();
-    mysqli_query($conn, "delete from login where tavid=$compid");
-}    
-
-public static function DelRunAndRes($compid) {
-    $conn = self::openConnection();
-    mysqli_query($conn, "delete from runners where tavid=$compid");
-}
-
-public static function CreateCompetition($name,$org,$date,$tenths) {
-    $conn = self::openConnection();
-    $res = mysqli_query($conn, "select max(tavid)+1 from login");
-    list($id) = mysqli_fetch_row($res);
-    if ($id < 10000)
-	$id = 10000;
-    if (isset($tenths))
-        $tenthValue = 1;
-    else
-        $tenthValue = 0;
-    mysqli_begin_transaction($conn);
-    $q1 = mysqli_query($conn, "insert into login(tavid,user,pass,compName,organizer,compDate,public,tenths) values(".$id.",'".md5($name.$org.$date)."','".md5("liveresultat")."','".$name."','".$org."','".$date."',0,'".$tenthValue."')");
-    $q2 = mysqli_query($conn, "insert into header(tavid,fg,bg,url,url2,logo,logoname) values('".$id."','navbar-dark','#0f2170', '/', '/index.php', 'liveoresults.svg', 'liveoresults.svg')");
-    if ($q1 && $q2) {
-      mysqli_commit($conn);
-    } else {
-      mysqli_rollback($conn);
-    };
-}
-
-	public static function CreateCompetitionFull($name,$org,$date, $email, $password, $country)
-    	{
-        $conn = self::openConnection();
-	 $res = mysqli_query($conn, "select max(tavid)+1 from login");
-	 list($id) = mysqli_fetch_row($res);
-	 if ($id < 10000)
-		$id = 10000;
-
-
-	 mysqli_query($conn, "insert into login(tavid,user,pass,compName,organizer,compDate,public, country) values(".$id.",'".$email."','".md5($password)."','".$name."','".$org."','".$date."',0,'".$country."')") or die(mysqli_error($conn));
-	 	return $id;
-	}
-
-
-	public static function AddRadioControl($compid,$classname,$name,$code)
-
-        {
-        $conn = self::openConnection();
-	 $res = mysqli_query($conn, "select count(*)+1 from splitcontrols where classname='$classname' and tavid=$compid");
-	 list($id) = mysqli_fetch_row($res);
-
-	 mysqli_query($conn, "insert into splitcontrols(tavid,classname,name,code,corder) values($compid,'$classname','$name',$code,$id)") or die(mysqli_error($conn));
-
-	}
-
-public static function UpdateCompetition($id,$name,$org,$date,$tenths,$public,$timediff)
-
-        {
-        $conn = self::openConnection();
-	 $sql = "update login set compName = '$name', organizer='$org', compDate ='$date',timediff=$timediff, tenths=" . (!isset($tenths) ? "0" : "1") .", public=". (!isset($public) ? "0":"1") ." where tavid=$id";
-
-	 mysqli_query($conn, $sql) or die(mysqli_error($conn));
-
-	}
-
-	public static function GetAllCompetitions()
-
-        {
-        $conn = self::openConnection();
-
-	 $result = mysqli_query($conn, "select compName, compDate,tavid,timediff,organizer,public from login order by compDate desc");
-
-         $ret = Array();
-
-         while ($tmp = mysqli_fetch_array($result))
-
-	 {
-
- 		$ret[] = $tmp;
-
-         }
-
-		mysqli_free_result($result);
-
- 	return $ret;
-
-        }
-
-	public static function GetCompetition($compid)
-
-        {
-        $conn = self::openConnection();
-
-	 $result = mysqli_query($conn, "select compName, compDate,tavid,organizer,public,tenths,timediff, timezone, multidaystage,multidayparent from login where tavid=$compid");
-
-         $ret = null;
-
-         while ($tmp = mysqli_fetch_array($result))
-
-	 {
-
- 		$ret = $tmp;
-
-         }
-
-		mysqli_free_result($result);
-
- 	return $ret;
-
-        }
-
-public static function GetHeader($compid) {
-     $conn = self::openConnection();
-     $result = mysqli_query($conn, "select fg, bg, logo, url, url2, logoname from header where tavid=$compid");
-     $ret = null;
-     while ($tmp = mysqli_fetch_array($result)) {
-       $ret = $tmp;
-     }
-     mysqli_free_result($result);
-     return $ret;
-}
-
-public static function SetHeader($compid,$fg,$bg,$url,$url2) {
-    $conn = self::openConnection();
-    $sql = "update header set fg='$fg', bg='$bg', url='$url', url2='$url2'  where tavid=$compid";
-    mysqli_query($conn, $sql) or die(mysqli_error($conn));
-}
-
-public static function UploadLogo($compid,$file) {
-  $destination = "../logos/";
-  //$target_file = "../logos/" . basename($file["name"]);
-  $filename = basename($file["name"]);
-  $uploadOk = 1;
-  $imageFileType = strtolower(pathinfo($destination . $filename,PATHINFO_EXTENSION));
-
-  // Check if image file is a actual image or fake image
-  if (is_uploaded_file($file['tmp_name'])) {
-    $check = getimagesize($file["tmp_name"]);
-    if($check !== false or $imageFileType == "svg") {
-      $uploadOk = 1;
-    } else if ($imageFileType == "svg") {
-      $uploadOk = 1;
-    } else {
-      echo '<script>alert("File is not an image.")</script>';
-      $uploadOk = 0;
     }
-  }
 
-  // Check file size < 50k
-  if ($uploadOk == 1 && $file["size"] > 50000) {
-    echo '<script>alert("Sorry, your file is too large.")</script>';
-    $uploadOk = 0;
-  }
+    function __construct($compID)
+    {
+        $this->m_CompId = $compID;
 
-  // Only allow SVG, JPEG, PNG file formats
-  $allowed_file_types = ['image/png', 'image/jpeg', 'image/svg+xml'];
-  $mime_type = mime_content_type($file['tmp_name']);
-  if (! in_array($mime_type, $allowed_file_types)) {
-    $uploadOk = 0;
-    echo '<script>alert("Your file does not have an allowed format: "'.$mime_type.')</script>';
-  } else {
-    switch ($mime_type) {
-      case "image/png":
-        $extn = ".png";
-        break;
-      case "image/jpeg":
-        $extn = ".jpg";
-        break;
-      case "image/svg+xml":
-        $extn= ".svg";
-        break;
-    }
-  }
+        $this->m_Conn = self::openConnection();
 
-  // Check if $uploadOk is set to 0 by an error
-  if ($uploadOk == 1) {
-    $savename = md5($compid.$filename) . $extn;
-    // Record savename associated with event.
-    $conn = self::openConnection();
-    $result = mysqli_query($conn, "select compName from login where tavid = '".$compid."' ") or die(mysqli_error($conn));
-    $compName = mysqli_fetch_row($result);
-    mysqli_query($conn, "update header set logo = '".md5($compid.$compName).$extn."', logoname = '".$filename."' where tavid =  '".$compid."'") or die(mysqli_error($conn));
+        $result = mysqli_query($this->m_Conn, "select * from login where tavid = $compID");
 
-    if (move_uploaded_file($file["tmp_name"], $destination.md5($compid.$compName).$extn)) {
-      echo '<script>alert("The file ". htmlspecialchars( basename( $file["name"])). " has been uploaded.")</script>';
-    } else {
-      echo '<script>alert("Sorry, there was an error uploading your file.")</script>';
-    }
-  }
-}
+        if ($tmp = mysqli_fetch_array($result)) {
+            $this->m_CompName = $tmp['compName'];
 
-	function __construct($compID)
+            $this->m_CompDate = date('Y-m-d', strtotime($tmp['compDate']));
 
-	{
+            $this->m_TimeDiff = $tmp['timediff'] * 3600;
 
-		$this->m_CompId = $compID;
+            $this->m_Tenths = $tmp['tenths'];
 
-		$this->m_Conn = self::openConnection();
-
-
-
-		$result = mysqli_query($this->m_Conn, "select * from login where tavid = $compID");
-
-		if ($tmp = mysqli_fetch_array($result))
-
-		  {
-
-		    $this->m_CompName = $tmp["compName"];
-
-		    $this->m_CompDate = date("Y-m-d",strtotime($tmp["compDate"]));
-
-		    $this->m_TimeDiff = $tmp["timediff"]*3600;
-
-                    $this->m_Tenths = $tmp['tenths'];
-
-		    if (isset($tmp['multidaystage']))
-		    {
-		    	if ($tmp['multidaystage'] != null && $tmp['multidayparent'] != null && $tmp['multidaystage'] > 1)
-		    	{
-		    		$this->m_IsMultiDayEvent = true;
-		    		$this->m_MultiDayStage = $tmp['multidaystage'];
-		    		$this->m_MultiDayParent = $tmp['multidayparent'];
-		    	}
-		    }
-
-		  }
-
-	}
-
-	function IsMultiDayEvent()
-	{
-		return $this->m_IsMultiDayEvent;
-	}
-
-        function IsTenths()
-        {
-                return $this->m_Tenths;
+            if (isset($tmp['multidaystage'])) {
+                if ($tmp['multidaystage'] != null && $tmp['multidayparent'] != null && $tmp['multidaystage'] > 1) {
+                    $this->m_IsMultiDayEvent = true;
+                    $this->m_MultiDayStage = $tmp['multidaystage'];
+                    $this->m_MultiDayParent = $tmp['multidayparent'];
+                }
+            }
         }
-  
-	function CompName()
+    }
 
-	{
-	  return $this->m_CompName;
-	}
+    function IsMultiDayEvent()
+    {
+        return $this->m_IsMultiDayEvent;
+    }
 
-	function CompDate()
+    function IsTenths()
+    {
+        return $this->m_Tenths;
+    }
 
-	{
+    function CompName()
+    {
+        return $this->m_CompName;
+    }
 
-	  return $this->m_CompDate;
+    function CompDate()
+    {
+        return $this->m_CompDate;
+    }
 
-	}
-  
-  function TimeZoneDiff()
-  {
-    return $this->m_TimeDiff/3600;
-  }
-  
+    function TimeZoneDiff()
+    {
+        return $this->m_TimeDiff / 3600;
+    }
 
-	function Classes()
-	{
+    function Classes()
+    {
+        $ret = array();
 
-		$ret = Array();
+        $q = 'SELECT Class From runners where TavId = ' . $this->m_CompId . ' Group By Class';
 
-		$q = "SELECT Class From runners where TavId = ". $this->m_CompId ." Group By Class";
+        if ($result = mysqli_query($this->m_Conn, $q)) {
+            while ($row = mysqli_fetch_array($result)) {
+                $ret[] = $row;
+            }
 
-		if ($result = mysqli_query($this->m_Conn, $q))
+            mysqli_free_result($result);
+        } else
+            die(mysqli_error($this->m_Conn));
 
-		{
+        return $ret;
+    }
 
-			while ($row = mysqli_fetch_array($result))
+    function getAllSplitControls()
+    {
+        $ret = array();
+        $q =
+            'SELECT code, name, classname, corder from splitcontrols where tavid = '
+            . $this->m_CompId
+            . ' order by corder';
+        if ($result = mysqli_query($this->m_Conn, $q)) {
+            while ($tmp = mysqli_fetch_array($result)) {
+                $ret[] = $tmp;
+            }
+            mysqli_free_result($result);
+        } else {
+            echo mysqli_error($this->m_Conn);
+        }
 
-			{
+        return $ret;
+    }
 
-				$ret[] = $row;
+    function getSplitControlsForClass($className)
+    {
+        $ret = array();
 
-			}
+        $q =
+            'SELECT Control from results, runners where results.TavID = '
+            . $this->m_CompId
+            . ' and runners.TavID = '
+            . $this->m_CompId
+            . " and results.dbid = runners.dbid and runners.class = '"
+            . mysqli_real_escape_string($this->m_Conn, $className)
+            . "' and results.Control != 1000 Group by Control";
 
-			mysqli_free_result($result);
+        $q =
+            'SELECT code, name from splitcontrols where tavid = '
+            . $this->m_CompId
+            . " and classname = '"
+            . mysqli_real_escape_string($this->m_Conn, $className)
+            . "' order by corder";
 
-		}
+        if ($result = mysqli_query($this->m_Conn, $q)) {
+            while ($tmp = mysqli_fetch_array($result)) {
+                $ret[] = $tmp;
+            }
 
-		else
+            mysqli_free_result($result);
+        } else {
+            echo mysqli_error($this->m_Conn);
+        }
 
-			die(mysqli_error($this->m_Conn));
+        return $ret;
+    }
 
-		return $ret;
+    function getResultsForClass($className)
+    {
+        return $this->getSplitsForClass($className, 1000);
+    }
 
+    function getLastPassings($num)
+    {
+        $ret = array();
 
+        $q =
+            'SELECT runners.Name, runners.class, runners.Club, results.Time,results.Status, results.Changed, results.Control, splitcontrols.name as pname From results inner join runners on results.DbId = runners.DbId left join splitcontrols on (splitcontrols.code = results.Control and splitcontrols.tavid='
+            . $this->m_CompId
+            . ' and runners.class = splitcontrols.classname) where results.TavId ='
+            . $this->m_CompId
+            . ' AND runners.TavId = results.TavId and results.Status <> -1 AND results.Time <> -1 AND results.Status <> 9 and results.Status <> 10 and results.control <> 100 and (results.control = 1000 or splitcontrols.tavid is not null) ORDER BY results.changed desc limit '
+            . $num;
 
-	}
+        if ($result = mysqli_query($this->m_Conn, $q)) {
+            while ($row = mysqli_fetch_array($result)) {
+                $ret[] = $row;
+                if ($this->m_TimeDiff != 0) {
+                    $ret[sizeof($ret) - 1]['Changed'] = date(
+                        'Y-m-d H:i:s',
+                        strtotime($ret[sizeof($ret) - 1]['Changed']) + $this->m_TimeDiff,
+                    );
+                }
+            }
 
-function getAllSplitControls()
-{
-	$ret = Array();
-	$q = "SELECT code, name, classname, corder from splitcontrols where tavid = " .$this->m_CompId. " order by corder";
-	if ($result = mysqli_query($this->m_Conn, $q))
-	{
-		while($tmp = mysqli_fetch_array($result))
-		{
-			$ret[] = $tmp;
-		}
-		mysqli_free_result($result);
-	} 
-	else
-	{ 
-		echo(mysqli_error($this->m_Conn));
-	}
-	
-	return $ret;
+            mysqli_free_result($result);
+        } else
+            die(mysqli_error($this->m_Conn));
+
+        return $ret;
+    }
+
+    function getSplitsForClass($className, $split)
+    {
+        $ret = array();
+
+        $q =
+            'SELECT runners.Name, runners.Club, results.Time,results.Status, results.Changed From runners,results where results.DbID = runners.DbId AND results.TavId = '
+            . $this->m_CompId
+            . ' AND runners.TavId = '
+            . $this->m_CompId
+            . " AND runners.Class = '"
+            . $className
+            . "' and results.Status <> -1 AND (results.Time <> -1 or (results.Time = -1 and (results.Status = 2 or results.Status=3))) AND results.Control = $split ORDER BY results.Status, results.Time";
+
+        if ($result = mysqli_query($this->m_Conn, $q)) {
+            while ($row = mysqli_fetch_array($result)) {
+                $ret[] = $row;
+            }
+
+            mysqli_free_result($result);
+        } else
+            die(mysqli_error($this->m_Conn));
+
+        return $ret;
+    }
+
+    function getClubResults($compId, $club)
+    {
+        $ret = array();
+
+        $q = 'SELECT runners.Name, runners.Club, runners.bib, results.Time, runners.Class ,results.Status, results.Changed, results.DbID, results.Control ';
+        $q .= ', (select count(*)+1 from results sr, runners sru where sr.tavid=sru.tavid and sr.dbid=sru.dbid and sr.tavid=results.TavId and sru.class = runners.class and sr.status = 0 and sr.time < results.time and sr.Control=1000) as place ';
+        $q .= ', results.Time - (select min(time) from results sr, runners sru where sr.tavid=sru.tavid and sr.dbid=sru.dbid and sr.tavid=results.TavId and sru.class = runners.class and sr.status = 0 and sr.Control=1000) as timeplus ';
+        $q .= 'From runners,results where ';
+        $q .=
+            'results.DbID = runners.DbId AND results.TavId = '
+            . $this->m_CompId
+            . ' AND runners.TavId = '
+            . $this->m_CompId
+            . " and runners.Club = '"
+            . mysqli_real_escape_string($this->m_Conn, $club)
+            . "' and (results.Control=1000 or results.Control=100) ORDER BY runners.Class, runners.Name";
+
+        if ($result = mysqli_query($this->m_Conn, $q)) {
+            while ($row = mysqli_fetch_array($result)) {
+                $dbId = $row['DbID'];
+                if (!isset($ret[$dbId])) {
+                    $ret[$dbId] = array();
+                    $ret[$dbId]['DbId'] = $dbId;
+                    if (is_null($row['bib'])) {
+                        $ret[$dbId]['Name'] = $row['Name'];
+                    } else {
+                        $ret[$dbId]['Name'] = $row['Name'] . ' (' . $row['bib'] . ')';
+                    }
+                    $ret[$dbId]['Club'] = $row['Club'];
+                    $ret[$dbId]['Class'] = $row['Class'];
+                    $ret[$dbId]['Time'] = '';
+                    $ret[$dbId]['TimePlus'] = '';
+                    $ret[$dbId]['Status'] = '9';
+                    $ret[$dbId]['Changed'] = '';
+                    $ret[$dbId]['Place'] = '';
+                }
+
+                $split = $row['Control'];
+                if ($split == 1000) {
+                    $ret[$dbId]['Time'] = $row['Time'];
+                    $ret[$dbId]['Status'] = $row['Status'];
+                    $ret[$dbId]['Changed'] = $row['Changed'];
+                    $ret[$dbId]['Place'] = $row['place'];
+                    $ret[$dbId]['TimePlus'] = $row['timeplus'];
+                } elseif ($split == 100) {
+                    $ret[$dbId]['start'] = $row['Time'];
+                }
+            }
+
+            mysqli_free_result($result);
+        } else
+            die(mysqli_error($this->m_Conn));
+
+        return $ret;
+    }
+
+    function getAllSplitsForClass($className)
+    {
+        $ret = array();
+
+        $q =
+            'SELECT runners.Name, runners.bib, runners.Club, results.Time ,results.Status, results.Changed, results.DbID, results.Control, results.finalPosition From runners,results where results.DbID = runners.DbId AND results.TavId = '
+            . $this->m_CompId
+            . ' AND runners.TavId = '
+            . $this->m_CompId
+            . " AND runners.Class = '"
+            . mysqli_real_escape_string($this->m_Conn, $className)
+            . "'  ORDER BY results.Dbid";
+
+        if ($result = mysqli_query($this->m_Conn, $q)) {
+            while ($row = mysqli_fetch_array($result)) {
+                $dbId = $row['DbID'];
+
+                if (!isset($ret[$dbId])) {
+                    $ret[$dbId] = array();
+                    $ret[$dbId]['DbId'] = $dbId;
+                    if (is_null($row['bib'])) {
+                        $ret[$dbId]['Name'] = $row['Name'];
+                    } else {
+                        $ret[$dbId]['Name'] = $row['Name'] . ' (' . $row['bib'] . ')';
+                    }
+                    $ret[$dbId]['Club'] = $row['Club'];
+                    $ret[$dbId]['Time'] = '';
+                    $ret[$dbId]['Status'] = '9';
+                    $ret[$dbId]['Changed'] = '';
+                    $ret[$dbId]['FinalPos'] = '0';
+                }
+
+                $split = $row['Control'];
+                if ($split == 1000) {
+                    $ret[$dbId]['Time'] = $row['Time'];
+                    $ret[$dbId]['Status'] = $row['Status'];
+                    $ret[$dbId]['Changed'] = $row['Changed'];
+                    $ret[$dbId]['FinalPos'] = $row['finalPosition'];
+                } elseif ($split == 100) {
+                    $ret[$dbId]['start'] = $row['Time'];
+                } else {
+                    $ret[$dbId][$split . '_time'] = $row['Time'];
+                    $ret[$dbId][$split . '_status'] = $row['Status'];
+                    $ret[$dbId][$split . '_changed'] = $row['Changed'];
+                }
+            }
+
+            mysqli_free_result($result);
+        } else
+            die(mysqli_error($this->m_Conn));
+
+        function timeSorter($a, $b)
+        {
+            if ($a['Status'] != $b['Status']) {
+                return $a['Status'] - $b['Status'];
+            }
+            // At least one has a final position
+            elseif ($a['FinalPos'] > 0 || $b['FinalPos'] > 0) {
+                return $b['FinalPos'] - $a['FinalPos'];
+            }
+            // Neither has a position
+            else {
+                return $a['Time'] - $b['Time'];
+            }
+        }
+
+        usort($ret, 'timeSorter');
+        return $ret;
+    }
+
+    function getTotalResultsForClass($className)
+    {
+        $ret = array();
+
+        $ar = array();
+        if ($this->m_MultiDayParent == -1) {
+            $comps = '(' . $this->m_CompId . ')';
+        } else {
+            $q =
+                'Select TavId,multidaystage from login where MultiDayParent = '
+                . $this->m_MultiDayParent
+                . ' and MultiDayStage <='
+                . $this->m_MultiDayStage
+                . ' order by multidaystage';
+
+            $comps = '(';
+            if ($result = mysqli_query($this->m_Conn, $q)) {
+                $f = 1;
+                while ($row = mysqli_fetch_array($result)) {
+                    $ar[$row['TavId']] = $row['TavId'];
+                    if ($f == 0)
+                        $comps .= ',';
+                    $comps .= $row['TavId'];
+                    $f = 0;
+                }
+            }
+            mysqli_free_result($result);
+            $comps .= ')';
+        }
+
+        $q =
+            "SELECT results.Time, results.Status, results.TavId, results.DbID From runners,results where results.Control = 1000 and results.DbID = runners.DbId AND results.TavId in $comps AND runners.TavId = results.TavId AND runners.Class = '"
+            . mysqli_real_escape_string($this->m_Conn, $className)
+            . "'  ORDER BY results.Dbid";
+
+        if ($result = mysqli_query($this->m_Conn, $q)) {
+            while ($row = mysqli_fetch_array($result)) {
+                $dbId = $row['DbID'];
+
+                if (!isset($ret[$dbId])) {
+                    $ret[$dbId] = array();
+                    $ret[$dbId]['DbId'] = $dbId;
+                    $ret[$dbId]['Time'] = 0;
+                    $ret[$dbId]['Status'] = 0;
+                    foreach ($ar as $c) {
+                        $ret[$dbId]['c_' . $c] = false;
+                    }
+                }
+
+                $ret[$dbId]['Time'] += (int) $row['Time'];
+                $status = (int) $row['Status'];
+                if ($status > $ret[$dbId]['Status']) {
+                    $ret[$dbId]['Status'] = $status;
+                }
+                $ret[$dbId]['c_' . $row['TavId']] = true;
+            }
+
+            mysqli_free_result($result);
+
+            //print_r($ret);
+
+            /*set DNS on those missing any comp*/
+            foreach ($ret as $key => $val) {
+                $haveAll = true;
+                foreach ($ar as $c) {
+                    if (!$val['c_' . $c]) {
+                        $haveAll = false;
+                        break;
+                    }
+                }
+                if (!$haveAll) {
+                    $ret[$key]['Status'] = 1;
+                }
+            }
+        } else
+            die(mysqli_error($this->m_Conn));
+
+        $sres = array();
+        foreach ($ret as $key => $res) {
+            $sres[$res['DbId']]['DbId'] = $res['DbId'];
+            $sres[$res['DbId']]['Time'] = $res['Time'];
+            $sres[$res['DbId']]['Status'] = $res['Status'];
+        }
+
+        usort($sres, 'timeSorter');
+
+        $pl = 0;
+        $lastTime = -1;
+        $bestTime = -1;
+
+        foreach ($sres as $tr) {
+            if ($tr['Status'] == 0) {
+                if ($bestTime == -1)
+                    $bestTime = $tr['Time'];
+
+                if ($tr['Time'] > $lastTime)
+                    $pl++;
+                $ret[$tr['DbId']]['Place'] = $pl;
+                $ret[$tr['DbId']]['TotalPlus'] = $tr['Time'] - $bestTime;
+            } else {
+                $ret[$tr['DbId']]['Place'] = '-';
+                $ret[$tr['DbId']]['TotalPlus'] = 0;
+            }
+        }
+
+        //print_r($ret);
+        return $ret;
+    }
 }
-
-
-  function getSplitControlsForClass($className)
-
-  {
-
-    $ret = Array();
-
-    $q = "SELECT Control from results, runners where results.TavID = ". $this->m_CompId . " and runners.TavID = " . $this->m_CompId . " and results.dbid = runners.dbid and runners.class = '" . mysqli_real_escape_string($this->m_Conn, $className) ."' and results.Control != 1000 Group by Control";
-
-    $q = "SELECT code, name from splitcontrols where tavid = " .$this->m_CompId. " and classname = '" . mysqli_real_escape_string($this->m_Conn, $className) ."' order by corder";
-
-    if ($result = mysqli_query($this->m_Conn, $q))
-
-      {
-
-	while($tmp = mysqli_fetch_array($result))
-
-	  {
-
-	    $ret[] = $tmp;
-
-	  }
-
-	mysqli_free_result($result);
-
-
-
-      } else
-
-	{ echo(mysqli_error($this->m_Conn));
-
-	}
-
-    return $ret;
-
-  }
-
-	function getResultsForClass($className)
-
-  {
-
-   return $this->getSplitsForClass($className,1000);
-
-  }
-
-
-
-  function getLastPassings($num)
-
-  {
-
-    $ret = Array();
-
-	$q = "SELECT runners.Name, runners.class, runners.Club, results.Time,results.Status, results.Changed, results.Control, splitcontrols.name as pname From results inner join runners on results.DbId = runners.DbId left join splitcontrols on (splitcontrols.code = results.Control and splitcontrols.tavid=".$this->m_CompId." and runners.class = splitcontrols.classname) where results.TavId =".$this->m_CompId." AND runners.TavId = results.TavId and results.Status <> -1 AND results.Time <> -1 AND results.Status <> 9 and results.Status <> 10 and results.control <> 100 and (results.control = 1000 or splitcontrols.tavid is not null) ORDER BY results.changed desc limit ".$num;
-
-		if ($result = mysqli_query($this->m_Conn, $q))
-
-		{
-
-			while ($row = mysqli_fetch_array($result))
-
-			{
-
-				$ret[] = $row;
-				if ($this->m_TimeDiff != 0)
-				{
-					$ret[sizeof($ret)-1]["Changed"] = date("Y-m-d H:i:s",strtotime($ret[sizeof($ret)-1]["Changed"])+$this->m_TimeDiff);
-				}
-
-			}
-
-			mysqli_free_result($result);
-
-		}
-
-		else
-
-			die(mysqli_error($this->m_Conn));
-
-		return $ret;
-
-  }
-
-	function getSplitsForClass($className,$split)
-
-	{
-
-		$ret = Array();
-
-		$q = "SELECT runners.Name, runners.Club, results.Time,results.Status, results.Changed From runners,results where results.DbID = runners.DbId AND results.TavId = ". $this->m_CompId ." AND runners.TavId = ".$this->m_CompId ." AND runners.Class = '".$className."' and results.Status <> -1 AND (results.Time <> -1 or (results.Time = -1 and (results.Status = 2 or results.Status=3))) AND results.Control = $split ORDER BY results.Status, results.Time";
-
-		if ($result = mysqli_query($this->m_Conn, $q))
-
-		{
-
-			while ($row = mysqli_fetch_array($result))
-
-			{
-
-				$ret[] = $row;
-
-			}
-
-			mysqli_free_result($result);
-
-		}
-
-		else
-
-			die(mysqli_error($this->m_Conn));
-
-		return $ret;
-	}
-
-		function getClubResults($compId, $club)
-
-		{
-
-			$ret = Array();
-
-
-			$q = "SELECT runners.Name, runners.Club, runners.bib, results.Time, runners.Class ,results.Status, results.Changed, results.DbID, results.Control ";
-			$q .= ", (select count(*)+1 from results sr, runners sru where sr.tavid=sru.tavid and sr.dbid=sru.dbid and sr.tavid=results.TavId and sru.class = runners.class and sr.status = 0 and sr.time < results.time and sr.Control=1000) as place ";
-			$q .= ", results.Time - (select min(time) from results sr, runners sru where sr.tavid=sru.tavid and sr.dbid=sru.dbid and sr.tavid=results.TavId and sru.class = runners.class and sr.status = 0 and sr.Control=1000) as timeplus ";
-			$q .= "From runners,results where ";
-			$q .= "results.DbID = runners.DbId AND results.TavId = ". $this->m_CompId ." AND runners.TavId = ".$this->m_CompId ." and runners.Club = '". mysqli_real_escape_string($this->m_Conn, $club) ."' and (results.Control=1000 or results.Control=100) ORDER BY runners.Class, runners.Name";
-
-			if ($result = mysqli_query($this->m_Conn, $q))
-
-			{
-
-				while ($row = mysqli_fetch_array($result))
-
-				{
-					$dbId = $row['DbID'];
-					if (!isset($ret[$dbId]))
-					{
-
-						$ret[$dbId] = Array();
-						$ret[$dbId]["DbId"] = $dbId;
-                                                if (is_null($row['bib'])) {
-						  $ret[$dbId]["Name"] = $row['Name'];
-                                                } else {
-                                                  $ret[$dbId]["Name"] = $row['Name'] . ' (' . $row['bib'] . ')';
-                                                }
-						$ret[$dbId]["Club"] = $row['Club'];
-						$ret[$dbId]["Class"] = $row['Class'];
-						$ret[$dbId]["Time"] = "";
-						$ret[$dbId]["TimePlus"] = "";
-						$ret[$dbId]["Status"] = "9";
-						$ret[$dbId]["Changed"] = "";
-						$ret[$dbId]["Place"]  = "";
-					}
-
-					$split = $row['Control'];
-					if ($split == 1000)
-					{
-						$ret[$dbId]["Time"] = $row['Time'];
-						$ret[$dbId]["Status"] = $row['Status'];
-						$ret[$dbId]["Changed"] = $row['Changed'];
-						$ret[$dbId]["Place"] = $row['place'];
-						$ret[$dbId]["TimePlus"] = $row['timeplus'];
-
-					}
-					elseif ($split == 100)
-					{
-						$ret[$dbId]["start"] = $row['Time'];
-					}
-				}
-
-				mysqli_free_result($result);
-
-			}
-
-			else
-
-				die(mysqli_error($this->m_Conn));
-
-
-			return $ret;
-	}
-
-		function getAllSplitsForClass($className)
-
-		{
-
-			$ret = Array();
-
-
-			$q = "SELECT runners.Name, runners.bib, runners.Club, results.Time ,results.Status, results.Changed, results.DbID, results.Control, results.finalPosition From runners,results where results.DbID = runners.DbId AND results.TavId = ". $this->m_CompId ." AND runners.TavId = ".$this->m_CompId ." AND runners.Class = '". mysqli_real_escape_string($this->m_Conn, $className)."'  ORDER BY results.Dbid";
-
-			if ($result = mysqli_query($this->m_Conn, $q))
-
-			{
-
-				while ($row = mysqli_fetch_array($result))
-
-				{
-					$dbId = $row['DbID'];
-
-					if (!isset($ret[$dbId]))
-					{
-						$ret[$dbId] = Array();
-						$ret[$dbId]["DbId"] = $dbId;
-                                                if (is_null($row['bib'])) {
-						  $ret[$dbId]["Name"] = $row['Name'];
-                                                } else {
-                                                  $ret[$dbId]["Name"] = $row['Name'] . ' (' . $row['bib'] . ')';
-                                                }
-						$ret[$dbId]["Club"] = $row['Club'];
-						$ret[$dbId]["Time"] = "";
-						$ret[$dbId]["Status"] = "9";
-                                                $ret[$dbId]["Changed"] = "";
-                                                $ret[$dbId]["FinalPos"] = "0";
-					}
-
-					$split = $row['Control'];
-					if ($split == 1000)
-					{
-						$ret[$dbId]["Time"] = $row['Time'];
-						$ret[$dbId]["Status"] = $row['Status'];
-						$ret[$dbId]["Changed"] = $row['Changed'];
-                                                $ret[$dbId]["FinalPos"] = $row['finalPosition'];
-
-					}
-					elseif ($split == 100)
-					{
-						$ret[$dbId]["start"] = $row['Time'];
-
-					}
-					else
-					{
-						$ret[$dbId][$split."_time"] = $row['Time'];
-						$ret[$dbId][$split."_status"] = $row['Status'];
-						$ret[$dbId][$split."_changed"] = $row['Changed'];
-					}
-				}
-
-				mysqli_free_result($result);
-
-			}
-
-			else
-
-				die(mysqli_error($this->m_Conn));
-
-
-
-				function timeSorter($a,$b)
-					{
-                                          if ($a['Status'] != $b['Status'])
-                                          {
-                                            return $a['Status'] - $b['Status'];
-                                          }
-                                          // At least one has a final position
-                                          elseif ($a['FinalPos'] > 0 || $b['FinalPos'] > 0)
-                                          {
-                                              return $b['FinalPos'] - $a['FinalPos'];
-                                          }
-                                          // Neither has a position
-					  else
-                                          {
-					    return $a['Time'] - $b['Time'];
-					  }
-                                        }
-
-			usort($ret,'timeSorter');
-			return $ret;
-
-	}
-
-
-
-	function getTotalResultsForClass($className)
-	{
-				$ret = Array();
-
-				$ar = Array();
-				if ($this->m_MultiDayParent == -1)
-				{
-				     $comps = "(".$this->m_CompId.")";
-	    			} else {
-    					$q = "Select TavId,multidaystage from login where MultiDayParent = ".$this->m_MultiDayParent." and MultiDayStage <=".$this->m_MultiDayStage." order by multidaystage";
-
-					$comps = "(";
-					if ($result = mysqli_query($this->m_Conn, $q))
-					{
-						$f = 1;
-						while ($row = mysqli_fetch_array($result))
-						{
-							$ar[$row["TavId"]] = $row["TavId"];
-							if ($f == 0)
-								$comps .=",";
-							$comps .= $row["TavId"];
-							$f = 0;
-						}
-					}
-					mysqli_free_result($result);
-					$comps .= ")";
-				}
-
-
-				$q = "SELECT results.Time, results.Status, results.TavId, results.DbID From runners,results where results.Control = 1000 and results.DbID = runners.DbId AND results.TavId in $comps AND runners.TavId = results.TavId AND runners.Class = '".mysqli_real_escape_string($this->m_Conn, $className)."'  ORDER BY results.Dbid";
-
-				if ($result = mysqli_query($this->m_Conn, $q))
-
-				{
-					while ($row = mysqli_fetch_array($result))
-
-					{
-						$dbId = $row['DbID'];
-
-						if (!isset($ret[$dbId]))
-						{
-							$ret[$dbId] = Array();
-							$ret[$dbId]["DbId"]  = $dbId;
-							$ret[$dbId]["Time"] = 0;
-							$ret[$dbId]["Status"] = 0;
-							foreach ($ar as $c)
-							{
-								$ret[$dbId]["c_".$c] = false;
-							}
-						}
-
-						$ret[$dbId]["Time"] += (int)$row['Time'];
-						$status = (int)$row['Status'];
-						if ($status > $ret[$dbId]["Status"] )
-						{
-							$ret[$dbId]["Status"] = $status;
-						}
-						$ret[$dbId]["c_".$row['TavId']] = true;
-					}
-
-					mysqli_free_result($result);
-
-					//print_r($ret);
-
-					/*set DNS on those missing any comp*/
-					foreach($ret as $key => $val)
-					{
-						$haveAll = true;
-						foreach ($ar as $c)
-						{
-							if (!$val["c_".$c] )
-							{
-								$haveAll = false;
-								break;
-							}
-						}
-						if (!$haveAll)
-						{
-							$ret[$key]['Status'] = 1;
-						}
-					}
-
-				}
-
-				else
-
-					die(mysqli_error($this->m_Conn));
-
-
-
-			$sres = Array();
-			foreach ($ret as $key=>$res)
-			{
-					$sres[$res["DbId"]]["DbId"] = $res["DbId"];
-					$sres[$res["DbId"]]["Time"] = $res["Time"];
-					$sres[$res["DbId"]]["Status"] = $res["Status"];
-			}
-
-
-			usort($sres,'timeSorter');
-
-			$pl = 0;
-			$lastTime = -1;
-			$bestTime = -1;
-
-
-			foreach ($sres as $tr)
-			{
-
-				if ($tr['Status'] == 0)
-				{
-					if ($bestTime == -1)
-						$bestTime = $tr['Time'];
-
-					if ($tr['Time'] > $lastTime)
-						$pl++;
-					$ret[$tr['DbId']]["Place"] = $pl;
-					$ret[$tr['DbId']]["TotalPlus"] = $tr['Time'] - $bestTime;
-				}
-				else
-				{
-					$ret[$tr['DbId']]["Place"] = "-";
-					$ret[$tr['DbId']]["TotalPlus"] = 0;
-				}
-			}
-
-//print_r($ret);
-			return $ret;
-	}
-
-
-}
-
-
-
-?>

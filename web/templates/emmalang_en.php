@@ -1,116 +1,107 @@
 <?php
 
-$_TITLE = "Liveresults";
+$_TITLE = 'Liveresults';
 
-$_CHOOSECMP = "Choose competition";
+$_CHOOSECMP = 'Choose competition';
 
-$_AUTOUPDATE = "Automatic update";
+$_AUTOUPDATE = 'Automatic update';
 
-$_UP15SEK = "Every 15th second";
+$_UP15SEK = 'Every 15th second';
 
-$_UP30SEK = "Twice per minute";
+$_UP30SEK = 'Twice per minute';
 
-$_UP60SEK = "Once per minute";
+$_UP60SEK = 'Once per minute';
 
-$_UP120SEK = "Every two minutes";
+$_UP120SEK = 'Every two minutes';
 
-$_UPNEVER = "Never";
+$_UPNEVER = 'Never';
 
+$_LASTPASSINGS = 'Latest updates';
 
+$_LASTPASSFINISHED = 'finished';
 
-$_LASTPASSINGS="Latest updates";
+$_LASTPASSPASSED = 'passed';
 
-$_LASTPASSFINISHED="finished";
+$_LASTPASSWITHTIME = 'with time';
 
-$_LASTPASSPASSED="passed";
+$_CHOOSECLASS = 'Choose class';
 
-$_LASTPASSWITHTIME="with time";
+$_NOCLASSESYET = 'No classes defined yet';
 
-$_CHOOSECLASS="Choose class";
+$_CONTROLFINISH = 'Finish';
 
-$_NOCLASSESYET="No classes defined yet";
+$_NAME = 'Name';
 
-$_CONTROLFINISH="Finish";
+$_CLUB = 'Club';
+$_NATION = 'Nation';
 
-$_NAME="Name";
+$_TIME = 'Time';
 
-$_CLUB="Club";
-$_NATION = "Nation";
+$_NOCLASSCHOSEN = 'No class chosen!';
 
-$_TIME="Time";
+$_HELPREDRESULTS = 'Results updated in the last two minutes are marked in red';
 
-$_NOCLASSCHOSEN="No class chosen!";
+$_NOTICE = 'Please note that results on this page are not official. For official results please visit the organizers website.';
 
-$_HELPREDRESULTS="Results updated in the last two minutes are marked in red";
+$_STATUSDNS = 'dns';
 
-$_NOTICE="Please note that results on this page are not official. For official results please visit the organizers website.";
+$_STATUSDNF = 'dnf';
 
-$_STATUSDNS = "dns";
+$_STATUSWO = 'dns';
 
-$_STATUSDNF = "dnf";
+$_STATUSMOVEDUP = 'moved up';
 
-$_STATUSWO = "dns";
+$_STATUSNOTSTARTED = 'not started';
 
-$_STATUSMOVEDUP = "moved up";
+$_STATUSOK = 'Passed';
 
-$_STATUSNOTSTARTED="not started";
+$_STATUSMP = 'mp';
 
-$_STATUSOK = "Passed";
+$_STATUSDSQ = 'disq';
 
-$_STATUSMP = "mp";
+$_STATUSOT = 'ot';
 
-$_STATUSDSQ= "disq";
+$_FIRSTPAGECHOOSE = 'Choose competition to follow';
 
-$_STATUSOT="ot";
+$_FIRSTPAGEARCHIVE = 'Archive';
 
-
-
-$_FIRSTPAGECHOOSE = "Choose competition to follow";
-
-$_FIRSTPAGEARCHIVE = "Archive";
-
-$_FIRSTPAGELIVE = "Live";
-
-
+$_FIRSTPAGELIVE = 'Live';
 
 //new 2.0
 
-$_LOADINGRESULTS = "Loading results...";
+$_LOADINGRESULTS = 'Loading results...';
 
-$_ON = "On";
+$_ON = 'On';
 
-$_OFF = "Off";
+$_OFF = 'Off';
 
-$_TEXTSIZE = "Textsize";
+$_TEXTSIZE = 'Textsize';
 
-$_LARGER = "bigger";
+$_LARGER = 'bigger';
 
-$_SMALLER = "smaller";
+$_SMALLER = 'smaller';
 
-$_OPENINNEW = "Open in new window";
+$_OPENINNEW = 'Open in new window';
 
-$_FORORGANIZERS = "Information for organizers";
+$_FORORGANIZERS = 'Information for organizers';
 
-$_FORDEVELOPERS = "Information for developers (api)";
+$_FORDEVELOPERS = 'Information for developers (api)';
 
-$_RESETTODEFAULT = "Reset to default sorting";
+$_RESETTODEFAULT = 'Reset to default sorting';
 
-$_OPENINNEWWINDOW = "Open in new window";
+$_OPENINNEWWINDOW = 'Open in new window';
 
-$_INSTRUCTIONSHELP = "Instruction / help";
+$_INSTRUCTIONSHELP = 'Instruction / help';
 
-$_LOADINGCLASSES = "Loading classes...";
+$_LOADINGCLASSES = 'Loading classes...';
 
-$_START = "Start";
+$_START = 'Start';
 
-$_TOTAL = "Total";
+$_TOTAL = 'Total';
 
-$_CLASS = "Class";
-
+$_CLASS = 'Class';
 
 // 2.1
-$_ORGANIZER = "Organizer";
-$_DATE = "Date";
-$_EVENTNAME = "Name";
-
-?>
+$_ORGANIZER = 'Organizer';
+$_DATE = 'Date';
+$_EVENTNAME = 'Name';

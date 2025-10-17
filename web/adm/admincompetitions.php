@@ -1,31 +1,25 @@
 <?php
 
-include_once("../templates/emmalang_en.php");
-include_once("../templates/classEmma.class.php");
+include_once '../templates/emmalang_en.php';
+include_once '../templates/classEmma.class.php';
 
-   $lang = "en";
+$lang = 'en';
 
-   if (isset($_GET['lang']) && $_GET['lang'] != "")
+if (isset($_GET['lang']) && $_GET['lang'] != '') {
+    $lang = $_GET['lang'];
+}
 
-   {
+include_once "../templates/emmalang_$lang.php";
 
-	$lang = $_GET['lang'];
-
-   }
-
-include_once("../templates/emmalang_$lang.php");
-
-header('Content-Type: text/html; charset='.$CHARSET);
-
-
+header('Content-Type: text/html; charset=' . $CHARSET);
 
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
         "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 
-<head><title><?=$_TITLE?></title>
-<meta http-equiv="Content-Type" content="text/html;charset=<?=$CHARSET?>">
+<head><title><?= $_TITLE ?></title>
+<meta http-equiv="Content-Type" content="text/html;charset=<?= $CHARSET ?>">
 <meta name="robots" content="noindex">
 
 
@@ -114,7 +108,7 @@ el.style.backgroundColor = "";
 
              <tr>
 
-               <td><a href="../index.php"><?=$_CHOOSECMP?></a></td>
+               <td><a href="../index.php"><?= $_CHOOSECMP ?></a></td>
 
              </tr>
 
@@ -147,25 +141,23 @@ el.style.backgroundColor = "";
 
 <?php
 
-	$comps = Emma::GetAllCompetitions();
+$comps = Emma::GetAllCompetitions();
 
-	//echo(sizeof($comps));
+//echo(sizeof($comps));
 
-	//for ($i = 0; $i < sizeof($comps); $i++)
+//for ($i = 0; $i < sizeof($comps); $i++)
 
-	foreach ($comps as $comp)
+foreach ($comps as $comp) { ?>
 
-	{
+		<tr id="row<?= $comp['tavid'] ?>"><td><?= date('Y-m-d', strtotime($comp['compDate'])) ?></td><td><?=
+        $comp['compName']
+    ?></td><td><?= $comp['organizer'] ?></td><td><?= $comp['public'] == '1' ? 'yes' : 'no' ?></td><td><a href="editComp.php?compid=<?=
+        $comp['tavid']
+    ?>">Edit</a></tr>
 
-	?>
+	<?php }
 
-		<tr id="row<?=$comp["tavid"]?>"><td><?=date("Y-m-d",strtotime($comp['compDate']))?></td><td><?=$comp["compName"]?></td><td><?=$comp["organizer"]?></td><td><?=$comp["public"] == "1" ? "yes" : "no"?></td><td><a href="editComp.php?compid=<?=$comp["tavid"]?>">Edit</a></tr>
-
-	<?php
-
-	}
-
-	?>
+?>
 
 			</table>
 

@@ -1,87 +1,84 @@
-﻿<?php
+<?php
 
 //Language-ressource file: Czech = Česky
 //translated by Przemek Patejko
 
-$_NAME = "Nazwa";
-$_ORGANIZER = "Organizator";
+$_NAME = 'Nazwa';
+$_ORGANIZER = 'Organizator';
 
-$_TITLE = "Wyniki na żywo";
+$_TITLE = 'Wyniki na żywo';
 
-$_CHOOSECMP = "Wybierz zawody";
+$_CHOOSECMP = 'Wybierz zawody';
 
-$_AUTOUPDATE = "Odświeżanie automatyczne";
+$_AUTOUPDATE = 'Odświeżanie automatyczne';
 
-$_UP15SEK = "Co 15 sekund";
+$_UP15SEK = 'Co 15 sekund';
 
-$_UP30SEK = "Co 30 sekund";
+$_UP30SEK = 'Co 30 sekund';
 
-$_UP60SEK = "Co minutę";
+$_UP60SEK = 'Co minutę';
 
-$_UP120SEK = "Co 2 minuty";
+$_UP120SEK = 'Co 2 minuty';
 
-$_UPNEVER = "Nigdy";
+$_UPNEVER = 'Nigdy';
 
+$_LASTPASSINGS = 'Ostatnie aktualizacje';
 
+$_LASTPASSFINISHED = 'ukończył/a';
 
-$_LASTPASSINGS="Ostatnie aktualizacje";
+$_LASTPASSPASSED = 'minął/ęła';
 
-$_LASTPASSFINISHED="ukończył/a";
+$_LASTPASSWITHTIME = 'z czasem';
 
-$_LASTPASSPASSED="minął/ęła";
+$_CHOOSECLASS = 'Wybierz kategorię';
 
-$_LASTPASSWITHTIME="z czasem";
+$_NOCLASSESYET = 'Nie zdefiniowano jeszcze kat.';
 
-$_CHOOSECLASS="Wybierz kategorię";
+$_CONTROLFINISH = 'Meta';
 
-$_NOCLASSESYET="Nie zdefiniowano jeszcze kat.";
+$_NAME = 'Nazwisko';
 
-$_CONTROLFINISH="Meta";
+$_CLUB = 'Klub';
+$_NATION = 'Kraj';
 
-$_NAME="Nazwisko";
+$_TIME = 'Czas';
 
-$_CLUB="Klub";
-$_NATION = "Kraj";
+$_NOCLASSCHOSEN = 'Nie wybrano kategorii!';
 
-$_TIME="Czas";
+$_HELPREDRESULTS = 'Wyniki zaktualizowane w ostatnich 2 minutach są oznaczone na czerwono.';
 
-$_NOCLASSCHOSEN="Nie wybrano kategorii!";
+$_NOTICE = 'Wyniki na tej stronie są nieoficjalne. Przejdź na stronę organizatora, aby zobaczyć wyniki oficjalne.';
 
-$_HELPREDRESULTS="Wyniki zaktualizowane w ostatnich 2 minutach są oznaczone na czerwono.";
-
-$_NOTICE="Wyniki na tej stronie są nieoficjalne. Przejdź na stronę organizatora, aby zobaczyć wyniki oficjalne.";
-
-$_STATUSDNS = "abs";
-$_STATUSDNF = "dnf";
-$_STATUSWO = "abs";
-$_STATUSMOVEDUP = "moved up";
-$_STATUSNOTSTARTED="nie startował/a";
-$_STATUSOK = "Passed";
-$_STATUSMP = "nkl";
-$_STATUSDSQ= "dysk.";
-$_FIRSTPAGECHOOSE = "Wybierz zawody do śledzenia";
-$_FIRSTPAGEARCHIVE = "Archiwum";
-$_FIRSTPAGELIVE = "Live";
+$_STATUSDNS = 'abs';
+$_STATUSDNF = 'dnf';
+$_STATUSWO = 'abs';
+$_STATUSMOVEDUP = 'moved up';
+$_STATUSNOTSTARTED = 'nie startował/a';
+$_STATUSOK = 'Passed';
+$_STATUSMP = 'nkl';
+$_STATUSDSQ = 'dysk.';
+$_FIRSTPAGECHOOSE = 'Wybierz zawody do śledzenia';
+$_FIRSTPAGEARCHIVE = 'Archiwum';
+$_FIRSTPAGELIVE = 'Live';
 //new 2.0
-$_LOADINGRESULTS = "Ładuję wyniki...";
-$_ON = "Wł.";
-$_OFF = "Wył.";
-$_TEXTSIZE = "Rozmiar tekstu";
-$_LARGER = "większy";
-$_SMALLER = "mniejszy";
-$_OPENINNEW = "Otwórz w nowym oknie";
-$_FORORGANIZERS = "Informacja dla organizatorów";
-$_FORDEVELOPERS = "Informacja dla deweloperów (api)";
-$_RESETTODEFAULT = "Przywróć standardowe sortowanie";
-$_OPENINNEWWINDOW = "Otwórz w nowym oknie";
-$_INSTRUCTIONSHELP = "Instrukcja / pomoc";
-$_LOADINGCLASSES = "Ładuję kategorię...";
-$_START = "Start";
-$_TOTAL = "Razem";
-$_CLASS = "Kategoria";
+$_LOADINGRESULTS = 'Ładuję wyniki...';
+$_ON = 'Wł.';
+$_OFF = 'Wył.';
+$_TEXTSIZE = 'Rozmiar tekstu';
+$_LARGER = 'większy';
+$_SMALLER = 'mniejszy';
+$_OPENINNEW = 'Otwórz w nowym oknie';
+$_FORORGANIZERS = 'Informacja dla organizatorów';
+$_FORDEVELOPERS = 'Informacja dla deweloperów (api)';
+$_RESETTODEFAULT = 'Przywróć standardowe sortowanie';
+$_OPENINNEWWINDOW = 'Otwórz w nowym oknie';
+$_INSTRUCTIONSHELP = 'Instrukcja / pomoc';
+$_LOADINGCLASSES = 'Ładuję kategorię...';
+$_START = 'Start';
+$_TOTAL = 'Razem';
+$_CLASS = 'Kategoria';
 
 // 2.1
-$_ORGANIZER = "Organizator";
-$_DATE = "Data";
-$_EVENTNAME = "Nazwa";
-?>
+$_ORGANIZER = 'Organizator';
+$_DATE = 'Data';
+$_EVENTNAME = 'Nazwa';
