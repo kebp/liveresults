@@ -1,51 +1,61 @@
 <?php
+declare(strict_types=1);
+
 include_once '../templates/classEmma.class.php';
 
-$comp = Emma::GetCompetition($_GET['compid']);
-if (count($comp) == 0) {
+$comp = Emma::GetCompetition((int) $_GET['compid']);
+if (count($comp) === 0) {
     header(Location: './admincompetitions.php');
     exit();
 }
 
-$hdr = Emma::GetHeader($_GET['compid']);
-$rcontrols = Emma::GetRadioControls($_GET['compid']);
-$stats = Emma::GetCompetitionStats($_GET['compid']);
+$hdr = Emma::GetHeader((int) $_GET['compid']);
+$rcontrols = Emma::GetRadioControls((int) $_GET['compid']);
+$stats = Emma::GetCompetitionStats((int) $_GET['compid']);
 
 if (isset($_POST['btnSave'])) {
     Emma::UpdateCompetition(
-        $_GET['compid'],
+        (int) $_GET['compid'],
         $_POST['name'],
         $_POST['org'],
         $_POST['date'],
-        $_POST['tenths'],
-        $_POST['public'],
-        $_POST['timediff'],
+        (bool) (isset($_POST['tenths']) ? 0 : 1),
+        (bool) (isset($_POST['public']) ? 0 : 1),
+        (int) $_POST['timediff'],
     );
-    isset($_POST['public']) ? ($comp['public'] = 1) : ($comp['public'] = 0);
-    isset($_POST['tenths']) ? ($comp['tenths'] = 1) : ($comp['tenths'] = 0);
-} else if (isset($_POST['btnAdd'])) {
+    isset($_POST['public']) ? ($comp['public'] = '1') : ($comp['public'] = '0');
+    isset($_POST['tenths']) ? ($comp['tenths'] = '1') : ($comp['tenths'] = '0');
+}
+
+if (isset($_POST['btnAdd'])) {
     Emma::AddRadioControl($_GET['compid'], $_POST['classname'], $_POST['controlname'], $_POST['code']);
 }
 
 if (isset($_GET['what'])) {
     switch ($_GET['what']) {
         case 'delctr':
-            Emma::DelRadioControl($_GET['compid'], $_GET['code'], $_GET['class']);
+            Emma::DelRadioControl((int) $_GET['compid'], (int) $_GET['code'], $_GET['class']);
             break;
         case 'delallctr':
-            Emma::DelAllRadioControls($_GET['compid']);
+            Emma::DelAllRadioControls((int) $_GET['compid']);
             break;
         case 'de':
-            Emma::DelEvent($_GET['compid']);
+            Emma::DelEvent((int) $_GET['compid']);
             break;
         case 'drs':
-            Emma::DelRunAndRes($_GET['compid']);
+            Emma::DelRunAndRes((int) $_GET['compid']);
             break;
         case 'hdr':
-            Emma::SetHeader($_GET['compid'], $_POST['foreground'], $_POST['background'], $_POST['url'], $_POST['url2']);
+            Emma::SetHeader(
+                (int) $_GET['compid'],
+                $_POST['foreground'],
+                $_POST['background'],
+                $_POST['url'],
+                $_POST['url2'],
+            );
             break;
         case 'logo':
-            Emma::UploadLogo($_GET['compid'], $_FILES['fileToUpload']);
+            Emma::UploadLogo((int) $_GET['compid'], $_FILES['fileToUpload']);
             break;
     }
 }
@@ -54,11 +64,11 @@ include_once '../templates/emmalang_en.php';
 
 $lang = 'en';
 
-if (isset($_GET['lang']) && $_GET['lang'] != '') {
+if (isset($_GET['lang']) && $_GET['lang'] !== '') {
     $lang = $_GET['lang'];
 }
 
-include_once "../templates/emmalang_$lang.php";
+include_once "../templates/emmalang_{$lang}.php";
 
 header('Content-Type: text/html; charset=' . $CHARSET);
 
@@ -113,7 +123,7 @@ function confirmDelete(msg,url)
 }
 
 function confirmDelEvent() {
-  var e = <?php echo $_GET['compid'] ?>;
+  var e = <?php echo filter_input(INPUT_GET, 'compid', FILTER_SANITIZE_NUMBER_INT) ?>;
   var n = <?php echo $stats['Names'] ?>;
   var t = <?php echo '"' . $comp['compName'] . '"' ?>;
   if (confirm('Are you SURE you want to delete the entire event ' + t + ' (' + e + ') with ' + n + ' runners?')) {
@@ -133,7 +143,7 @@ function confirmDelResults() {
 }
 
 function confirmDelAllRadio() {
-  var rc = <?php echo sizeof($rcontrols) ?>;
+  var rc = <?php echo count($rcontrols) ?>;
   var t = <?php echo '"' . $comp['compName'] . '"' ?>;
   if (confirm('Are you SURE you want to delete all ' + rc + ' radio controls from ' + t + '?')) {
     var x = document.getElementsByName('formdelradio');
@@ -215,9 +225,9 @@ function confirmDelAllRadio() {
 <input type="text" name="timediff" size="10" value="<?= $comp['timediff'] ?>"/><br/>
 
 <b>Public</b>
-<input type="checkbox" name="public" <?= $comp['public'] == 1 ? 'checked' : '' ?>/><br/>
+<input type="checkbox" name="public" <?= $comp['public'] === '1' ? 'checked' : '' ?>/><br/>
 <b>Show tenths second</b>
-<input type="checkbox" name="tenths" <?= $comp['tenths'] == 1 ? 'checked' : '' ?>/><br/><br/>
+<input type="checkbox" name="tenths" <?= $comp['tenths'] === '1' ? 'checked' : '' ?>/><br/><br/>
 <input type="submit" name="btnSave" class="btn btn-primary" value="Save"/>
 </form>
 
@@ -227,10 +237,12 @@ function confirmDelAllRadio() {
 <div>
   <b><label for="foreground">Foreground color</label></b>
   <select id="foreground" name="foreground">
-    <option <?php if ($hdr['fg'] == 'navbar-dark')
-        echo 'selected = "selected"'; ?> value="navbar-dark">Light text</option>
-    <option <?php if ($hdr['fg'] == 'navbar-light')
-        echo 'selected = "selected"'; ?> value="navbar-light">Dark text</option>
+    <option <?php if ($hdr['fg'] === 'navbar-dark') {
+        echo 'selected = "selected"';
+    } ?> value="navbar-dark">Light text</option>
+    <option <?php if ($hdr['fg'] === 'navbar-light') {
+        echo 'selected = "selected"';
+    } ?> value="navbar-light">Dark text</option>
   </select>
 </div>
 <div>
@@ -276,8 +288,9 @@ Should be in SVG format and &lt; 50k in size.</p>
 <table border="0">
 <tr><td><b>Code</td><td><b>Name</td><td><b>Class</td><td><b>Order</td></tr>
 <?php
-$rcontrols = Emma::GetRadioControls($_GET['compid']);
-for ($i = 0; $i < sizeof($rcontrols); $i++) {
+$rcontrols = Emma::GetRadioControls(intval($_GET['compid']));
+$id = filter_input(INPUT_GET, 'compid', FILTER_SANITIZE_NUMBER_INT);
+for ($i = 0; $i < count($rcontrols); $i++) {
     echo
         '<tr><td>'
         . $rcontrols[$i]['code']
@@ -288,9 +301,9 @@ for ($i = 0; $i < sizeof($rcontrols); $i++) {
             . '</td><td>'
             . $rcontrols[$i]['corder']
             . "</td><td><a href='javascript:confirmDelete(\"Do you want to delete this radiocontrol?\",\"?compid="
-            . $_GET['compid']
+            . $id
             . '&what=delctr&compid='
-            . $_GET['compid']
+            . $id
             . '&code='
             . $rcontrols[$i]['code']
             . '&class='

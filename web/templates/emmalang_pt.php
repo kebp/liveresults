@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 //Language-ressource file: Portuguese = Português
 //translated by Nuno Leite

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 //Language-resource file: Italian = Deutsch
 //translated by Eduardo Tona

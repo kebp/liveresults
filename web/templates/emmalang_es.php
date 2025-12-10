@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 //Language-ressource file: Spanish = Español
 //translated by Antonio Vázquez

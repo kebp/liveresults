@@ -1,4 +1,5 @@
-﻿<?php
+<?php
+declare(strict_types=1);
 
 //Language-ressource file: Czech = Česky
 //translated by Richard PÁTEK and Lukas Konig

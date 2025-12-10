@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 $_TITLE = 'Liveresultat orientering';
 $_CHOOSECMP = 'Välj tävling';
 $_AUTOUPDATE = 'Automatisk Uppdatering';

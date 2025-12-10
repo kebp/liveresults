@@ -1,15 +1,16 @@
 <?php
+declare(strict_types=1);
 
 include_once '../templates/emmalang_en.php';
 include_once '../templates/classEmma.class.php';
 
 $lang = 'en';
 
-if (isset($_GET['lang']) && $_GET['lang'] != '') {
+if (isset($_GET['lang']) && $_GET['lang'] !== '') {
     $lang = $_GET['lang'];
 }
 
-include_once "../templates/emmalang_$lang.php";
+include_once "../templates/emmalang_{$lang}.php";
 
 header('Content-Type: text/html; charset=' . $CHARSET);
 
@@ -151,7 +152,7 @@ foreach ($comps as $comp) { ?>
 
 		<tr id="row<?= $comp['tavid'] ?>"><td><?= date('Y-m-d', strtotime($comp['compDate'])) ?></td><td><?=
         $comp['compName']
-    ?></td><td><?= $comp['organizer'] ?></td><td><?= $comp['public'] == '1' ? 'yes' : 'no' ?></td><td><a href="editComp.php?compid=<?=
+    ?></td><td><?= $comp['organizer'] ?></td><td><?= $comp['public'] === '1' ? 'yes' : 'no' ?></td><td><a href="editComp.php?compid=<?=
         $comp['tavid']
     ?>">Edit</a></tr>
 

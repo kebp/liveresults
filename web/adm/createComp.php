@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 include_once '../templates/classEmma.class.php';
 
 if (isset($_POST['btnSubmit'])) {
@@ -11,11 +13,11 @@ include_once '../templates/emmalang_en.php';
 
 $lang = 'en';
 
-if (isset($_GET['lang']) && $_GET['lang'] != '') {
+if (isset($_GET['lang']) && $_GET['lang'] !== '') {
     $lang = $_GET['lang'];
 }
 
-include_once "../templates/emmalang_$lang.php";
+include_once "../templates/emmalang_{$lang}.php";
 
 header('Content-Type: text/html; charset=' . $CHARSET);
 

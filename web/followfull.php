@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 date_default_timezone_set('Europe/London');
 $lang = 'en';
 
@@ -7,34 +9,34 @@ if (isset($_GET['lang'])) {
 }
 
 include_once 'templates/emmalang_en.php';
-include_once "templates/emmalang_$lang.php";
+include_once "templates/emmalang_{$lang}.php";
 include_once 'templates/classEmma.class.php';
 
 header('Content-Type: text/html; charset=' . $CHARSET);
 
-$currentComp = new Emma($_GET['comp']);
-$header = Emma::GetHeader($_GET['comp']);
+$currentComp = new Emma((int) $_GET['comp']);
+$header = Emma::GetHeader((int) $_GET['comp']);
 
 $isSingleClass = isset($_GET['class']);
 $isSingleClub = isset($_GET['club']);
 $showPath = true;
 
-if (isset($_GET['showpath']) && $_GET['showpath'] == 'false') {
+if (isset($_GET['showpath']) && $_GET['showpath'] === 'false') {
     $showPath = false;
 }
 
 $singleClass = '';
 $singleClub = '';
 if ($isSingleClass) {
-    $singleClass = rawurldecode($_GET['class']);
+    $singleClass = rawurldecode(strval($_GET['class']));
 }
 if ($isSingleClub) {
-    $singleClub = rawurldecode($_GET['club']);
+    $singleClub = rawurldecode(strval($_GET['club']));
 }
 
 $showLastPassings =
-    !($isSingleClass || $isSingleClub) || isset($_GET['showLastPassings']) && $_GET['showLastPassings'] == 'true';
-$RunnerStatus = array(
+    !($isSingleClass || $isSingleClub) || isset($_GET['showLastPassings']) && $_GET['showLastPassings'] === 'true';
+$RunnerStatus = [
     '1' => $_STATUSDNS,
     '2' => $_STATUSDNF,
     '11' => $_STATUSWO,
@@ -44,13 +46,12 @@ $RunnerStatus = array(
     '3' => $_STATUSMP,
     '4' => $_STATUSDSQ,
     '5' => $_STATUSOT,
-    '9' => '',
     '10' => '',
-);
+];
 
 $showTimePrediction = true;
 
-echo "<?xml version=\"1.0\" encoding=\"$CHARSET\" ?>\n";
+echo "<?xml version=\"1.0\" encoding=\"{$CHARSET}\" ?>\n";
 ?>
 
 <!doctype html>
@@ -78,22 +79,11 @@ window.mobilecheck = function() {
 }
 </script>
 
-<?php
-$debug = isset($_GET['debug']) && $_GET['debug'] == 'true';
-if ($debug) { ?>
-<!-- DEBUG -->
-<script language="javascript" type="text/javascript" src="js/jquery-1.7.2.min.js"></script>
-<script language="javascript" type="text/javascript" src="js/jquery.dataTables.min.js"></script>
-<script language="javascript" type="text/javascript" src="js/jquery.ba-hashchange.min.js"></script>
-<script language="javascript" type="text/javascript" src="js/LiveResults.debug.js?rnd=<?= time() ?>"></script>
-<?php } else { ?>
-<!-- RELEASE-->
-<script language="javascript" type="text/javascript" src="js/liveresults.min.js"></script>
-<?php } ?>
 <script
   src="https://code.jquery.com/jquery-1.7.2.min.js"
   integrity="sha256-R7aNzoy2gFrVs+pNJ6+SokH04ppcEqJ0yFLkNGoFALQ="
   crossorigin="anonymous"></script>
+<script language="javascript" type="text/javascript" src="js/liveresults.min.js"></script>
 <script language="javascript" type="text/javascript" src="js/jquery.dataTables.min.js"></script>
 <script language="javascript" type="text/javascript" src="js/jquery.ba-hashchange.min.js"></script>
 <script language="javascript" type="text/javascript" src="js/NoSleep.min.js"></script>
@@ -230,137 +220,151 @@ $(document).ready(function()
         </li>
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <?php if ($lang == 'en') {
-                echo "<img src='images/en.png' alt='English'>";
-            } elseif ($lang == 'sv') {
-                echo "<img src='images/se.png' alt='Svenska'>";
-            } elseif ($lang == 'fi') {
-                echo "<img src='images/fi.png' alt='Suomeksi'>";
-            } elseif ($lang == 'ru') {
-                echo "<img src='images/ru.png' alt='Русский'>";
-            } elseif ($lang == 'cz') {
-                echo "<img src='images/cz.png' alt='Česky'>";
-            } elseif ($lang == 'de') {
-                echo "<img src='images/de.png' alt='Deutsch'>";
-            } elseif ($lang == 'bg') {
-                echo "<img src='images/bg.png' alt='български'>";
-            } elseif ($lang == 'fr') {
-                echo "<img src='images/fr.png' alt='Français'>";
-            } elseif ($lang == 'it') {
-                echo "<img src='images/it.png' border='0' alt='Italiano'>";
-            } elseif ($lang == 'hu') {
-                echo "<img src='images/hu.png' border='0' alt='Magyar'>";
-            } elseif ($lang == 'es') {
-                echo "<img src='images/es.png' border='0' alt='Español'>";
-            } elseif ($lang == 'pl') {
-                echo "<img src='images/pl.png' border='0' alt='Polska'>";
-            } else {
-                echo "<img src='images/pt.png?a' border='0' alt='Português'>";
-            }
-            ?>
+i           <?php switch ($lang) {
+        case 'en':
+            echo "<img src='images/en.png' alt='English'>";
+            break;
+        case 'sv':
+            echo "<img src='images/se.png' alt='Svenska'>";
+            break;
+        case 'fi':
+            echo "<img src='images/fi.png' alt='Suomeksi'>";
+            break;
+        case 'ru':
+            echo "<img src='images/ru.png' alt='Русский'>";
+            break;
+        case 'cz':
+            echo "<img src='images/cz.png' alt='Česky'>";
+            break;
+        case 'de':
+            echo "<img src='images/de.png' alt='Deutsch'>";
+            break;
+        case 'bg':
+            echo "<img src='images/bg.png' alt='български'>";
+            break;
+        case 'fr':
+            echo "<img src='images/fr.png' alt='Français'>";
+            break;
+        case 'it':
+            echo "<img src='images/it.png' border='0' alt='Italiano'>";
+            break;
+        case 'hu':
+            echo "<img src='images/hu.png' border='0' alt='Magyar'>";
+            break;
+        case 'es':
+            echo "<img src='images/es.png' border='0' alt='Español'>";
+            break;
+        case 'pl':
+            echo "<img src='images/pl.png' border='0' alt='Polska'>";
+            break;
+        default:
+            echo "<img src='images/pt.png?a' border='0' alt='Português'>";
+            break;
+    }
+    ?>
           </a>
         <ul class="dropdown-menu">
           <li><?php echo
-              $lang == 'en'
+              $lang === 'en'
                   ? "<img src='images/en.png' alt='English'> English <i class='fa fa-check'></i>"
                   : "<a href=\"?lang=en&amp;comp="
-                  . $_GET['comp']
+                  . strval(filter_input(INPUT_GET, 'comp', FILTER_SANITIZE_NUMBER_INT))
                   . "\" style='text-decoration: none'><img src='images/en.png' alt='English'> English</a>"
           ?>
           </li>
           <li><?php echo
-              $lang == 'sv'
+              $lang === 'sv'
                   ? "<img src='images/se.png' alt='Svenska'> Svenska <i class='fa fa-check' style='color:green;'></i>"
                   : "<a href=\"?lang=sv&amp;comp="
-                  . $_GET['comp']
+                  . strval(filter_input(INPUT_GET, 'comp', FILTER_SANITIZE_NUMBER_INT))
                   . "\" style='text-decoration: none'><img src='images/se.png' alt='Svenska'> Svenska</a>"
           ?>
           </li>
           <li><?php echo
-              $lang == 'fi'
+              $lang === 'fi'
                   ? "<img src='images/fi.png' alt='Suomeksi'> Suomeksi <i class='fa fa-check' style='color:green;'></i>"
                   : "<a href=\"?lang=fi&amp;comp="
-                  . $_GET['comp']
+                  . strval(filter_input(INPUT_GET, 'comp', FILTER_SANITIZE_NUMBER_INT))
                   . "\" style='text-decoration: none'><img src='images/fi.png'  alt='Suomeksi'> Suomeksi</a>"
           ?>
           </li>
           <li> <?php echo
-              $lang == 'ru'
+              $lang === 'ru'
                   ? "<img src='images/ru.png' alt='Русский'> Русский <i class='fa fa-check' style='color:green;'></i>"
                   : "<a href=\"?lang=ru&amp;comp="
-                  . $_GET['comp']
+                  . strval(filter_input(INPUT_GET, 'comp', FILTER_SANITIZE_NUMBER_INT))
                   . "\" style='text-decoration: none'><img src='images/ru.png' alt='Русский'> Русский</a>"
           ?>
           </li>
           <li><?php echo
-              $lang == 'cz'
+              $lang === 'cz'
                   ? "<img src='images/cz.png' alt='Česky'> Česky <i class='fa fa-check' style='color:green;'></i>"
                   : "<a href=\"?lang=cz&amp;comp="
-                  . $_GET['comp']
+                  . strval(filter_input(INPUT_GET, 'comp', FILTER_SANITIZE_NUMBER_INT))
                   . "\" style='text-decoration: none'><img src='images/cz.png' alt='Česky'> Česky</a>"
           ?>
           </li>
           <li> <?php echo
-              $lang == 'de'
+              $lang === 'de'
                   ? "<img src='images/de.png' alt='Deutsch'> Deutsch <i class='fa fa-check' style='color:green;'></i>"
                   : "<a href=\"?lang=de&amp;comp="
-                  . $_GET['comp']
+                  . strval(filter_input(INPUT_GET, 'comp', FILTER_SANITIZE_NUMBER_INT))
                   . "\" style='text-decoration: none'><img src='images/de.png' alt='Deutsch'> Deutsch</a>"
           ?>
           </li>
           <li><?php echo
-              $lang == 'bg'
+              $lang === 'bg'
                   ? "<img src='images/bg.png' alt='български'> български  <i class='fa fa-check' style='color:green;'></i>"
                   : "<a href=\"?lang=bg&amp;comp="
-                  . $_GET['comp']
+                  . strval(filter_input(INPUT_GET, 'comp', FILTER_SANITIZE_NUMBER_INT))
                   . "\" style='text-decoration: none'><img src='images/bg.png' alt='български'> български</a>"
           ?>
           </li>
           <li><?php echo
-              $lang == 'fr'
+              $lang === 'fr'
                   ? "<img src='images/fr.png' alt='Français'> Français <i class='fa fa-check' style='color:green;'></i>"
                   : "<a href=\"?lang=fr&amp;comp="
-                  . $_GET['comp']
+                  . strval(filter_input(INPUT_GET, 'comp', FILTER_SANITIZE_NUMBER_INT))
                   . "\" style='text-decoration: none'><img src='images/fr.png' alt='Français'> Français</a>"
           ?>
           </li>
           <li><?php echo
-              $lang == 'it'
+              $lang === 'it'
                   ? "<img src='images/it.png' border='0' alt='Italiano'> Italiano <i class='fa fa-check' style='color:green;'></i>"
                   : "<a href=\"?lang=it&amp;comp="
-                  . $_GET['comp']
+                  . strval(filter_input(INPUT_GET, 'comp', FILTER_SANITIZE_NUMBER_INT))
                   . "\" style='text-decoration: none'><img src='images/it.png' border='0' alt='Italiano'> Italiano</a>"
           ?>
           </li>
           <li><?php echo
-              $lang == 'hu'
+              $lang === 'hu'
                   ? "<img src='images/hu.png' border='0' alt='Magyar'> Magyar <i class='fa fa-check' style='color:green;'></i>"
                   : "<a href=\"?lang=hu&amp;comp="
-                  . $_GET['comp']
+                  . strval(filter_input(INPUT_GET, 'comp', FILTER_SANITIZE_NUMBER_INT))
                   . "\" style='text-decoration: none'><img src='images/hu.png' border='0' alt='Magyar'> Magyar</a>"
           ?>
           </li>
           <li><?php echo
-              $lang == 'es'
+              $lang === 'es'
                   ? "<img src='images/es.png' border='0' alt='Español'> Español <i class='fa fa-check' style='color:green;'></i>"
                   : "<a href=\"?lang=es&amp;comp="
-                  . $_GET['comp']
+                  . strval(filter_input(INPUT_GET, 'comp', FILTER_SANITIZE_NUMBER_INT))
                   . "\" style='text-decoration: none'><img src='images/es.png' border='0' alt='Español'> Español</a>"
           ?>
           </li>
           <li><?php echo
-              $lang == 'pl'
+              $lang === 'pl'
                   ? "<img src='images/pl.png' border='0' alt='Polska'> Polska <i class='fa fa-check' style='color:green;'></i>"
                   : "<a href=\"?lang=pl&amp;comp="
-                  . $_GET['comp']
+                  . strval(filter_input(INPUT_GET, 'comp', FILTER_SANITIZE_NUMBER_INT))
                   . "\" style='text-decoration: none'><img src='images/pl.png' border='0' alt='Polska'> Polska</a>"
           ?>
           </li>
           <li><?php echo
-              $lang == 'pt'
+              $lang === 'pt'
                   ? "<img src='images/pt.png?a' border='0' alt='Português'> Português <i class='fa fa-check' style='color:green;'></i>"
                   : "<a href=\"?lang=pt&amp;comp="
-                  . $_GET['comp']
+                  . strval(filter_input(INPUT_GET, 'comp', FILTER_SANITIZE_NUMBER_INT))
                   . "\" style='text-decoration: none'><img src='images/pt.png?a' border='0' alt='Português'> Português</a>"
           ?>
           </li>
@@ -376,7 +380,7 @@ $(document).ready(function()
     <span class="navbar-brand mb-0 h1"><?= $currentComp->CompName() ?> &#8210; <?= $currentComp->CompDate() ?></span>
 
     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-    <?php if (!$isSingleClass && !$isSingleClub) { ?>
+    <?php if ((!$isSingleClass) && (!$isSingleClub)) { ?>
       <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
           <span id="resultsHeader"><?= $_CHOOSECLASS ?></span>
@@ -415,7 +419,7 @@ $(document).ready(function()
 
 <div id=divFooter> 
   <font color="AAAAAA">* <?= $_HELPREDRESULTS ?></font>
-  <p align="left">&copy;2012-2024, <?= $_NOTICE ?></p>
+  <p align="left">&copy;2012-2025, <?= $_NOTICE ?></p>
 </div>
 
 </div>

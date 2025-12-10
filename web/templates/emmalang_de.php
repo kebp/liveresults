@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 //Language-ressource file: German = Deutsch
 //translated by Rainer Burmann, some tweaking by Simon Harston
