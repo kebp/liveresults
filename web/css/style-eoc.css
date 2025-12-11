@@ -58,6 +58,8 @@ tr.new_result td i {
 #langchooser { vertical-align: middle; line-height:21px;}
 #langchooser img {  border: 1px solid #AAAAAA; vertical-align: middle; height: 10px}
 
+img { border: 1px solid black; }
+
 #divClasses { white-space: nowrap;}
 
 .eI {

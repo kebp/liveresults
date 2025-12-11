@@ -50,12 +50,10 @@ $RunnerStatus = [
 ];
 
 $showTimePrediction = true;
-
-echo "<?xml version=\"1.0\" encoding=\"{$CHARSET}\" ?>\n";
 ?>
 
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="en-GB">
   <head>
     <title><?= $_TITLE ?> :: <?= $currentComp->CompName() ?> [<?= $currentComp->CompDate() ?>]</title>
     <meta charset="utf-8">
@@ -195,9 +193,7 @@ $(document).ready(function()
 <!-- MAIN DIV -->
 
 <?php if (!$isSingleClass && !$isSingleClub && $showPath) { ?>
-<nav class="navbar navbar-expand-lg <?= $header['fg'] ?>" style="background-color: <?= $header['bg'] ?>; color: <?=
-        $header['fg']
-    ?>;">
+<nav class="navbar navbar-expand-lg <?= $header['fg'] ?>" style="background-color: <?= $header['bg'] ?>;">
   <div class="container-fluid">
   <a class="navbar-brand" href="<?= $header['url'] ?>">
   <img src="logos/<?= $header['logo'] ?>" alt="Event logo" width="200" height="60" class="d-inline-block align-text-top">
@@ -220,7 +216,7 @@ $(document).ready(function()
         </li>
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-i           <?php switch ($lang) {
+           <?php switch ($lang) {
         case 'en':
             echo "<img src='images/en.png' alt='English'>";
             break;
