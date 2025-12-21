@@ -317,7 +317,7 @@ $(document).ready(function()
 
 <div id=divFooter> 
   <font color="AAAAAA">* <?=$_HELPREDRESULTS?></font>
-  <p align="left">&copy;2012-2023, <?=$_NOTICE?></p>
+  <p align="left">&copy;2012-2024, <?=$_NOTICE?></p>
 </div>
 
 </div>
