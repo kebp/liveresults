@@ -4,7 +4,7 @@ declare(strict_types=1);
 include_once '../templates/classEmma.class.php';
 
 if (isset($_POST['btnSubmit'])) {
-    Emma::CreateCompetition($_POST['name'], $_POST['org'], $_POST['date'], $_POST['tenths']);
+    Emma::CreateCompetition($_POST['name'], $_POST['org'], $_POST['date'], (bool) (isset($_POST['tenths']) ? 0 : 1));
     header('Location: admincompetitions.php');
     exit();
 }

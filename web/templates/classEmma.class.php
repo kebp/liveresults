@@ -6,7 +6,7 @@ class Emma
 {
     //public static $db_server = "liveresults.cvdrzxhnuzid.eu-west-2.rds.amazonaws.com";
     public static string $db_server = 'localhost';
-    public static string $db_database = 'liveresults2';
+    public static string $db_database = 'liveresults';
     public static string $db_user = 'liveresults';
     public static string $db_pw = 'w00dh0u2e';
     public static string $MYSQL_CHARSET = 'utf8';
@@ -134,7 +134,7 @@ class Emma
         mysqli_query($conn, "delete from runners where tavid={$compid}");
     }
 
-    public static function CreateCompetition(string $name, string $org, string $date, string $tenths): void
+    public static function CreateCompetition(string $name, string $org, string $date, bool $tenths): void
     {
         $conn = self::openConnection();
         $res = mysqli_query($conn, 'select max(tavid)+1 from login');
@@ -592,7 +592,7 @@ class Emma
                 if (!isset($ret[$dbId])) {
                     $ret[$dbId] = [];
                     $ret[$dbId]['DbId'] = $dbId;
-                    if (is_null($row['bib'])) {
+                    if (is_null($row['bib']) || $row['bib'] == '') {
                         $ret[$dbId]['Name'] = $row['Name'];
                     } else {
                         $ret[$dbId]['Name'] = $row['Name'] . ' (' . $row['bib'] . ')';
@@ -645,7 +645,7 @@ class Emma
                 if (!isset($ret[$dbId])) {
                     $ret[$dbId] = [];
                     $ret[$dbId]['DbId'] = $dbId;
-                    if (is_null($row['bib'])) {
+                    if (is_null($row['bib']) || $row['bib'] == '') {
                         $ret[$dbId]['Name'] = $row['Name'];
                     } else {
                         $ret[$dbId]['Name'] = $row['Name'] . ' (' . $row['bib'] . ')';
