@@ -21,8 +21,8 @@ CREATE TABLE `header` (
   `bg` varchar(20) DEFAULT NULL,
   `logo` varchar(50) DEFAULT NULL,
   `logoname` varchar(50) DEFAULT NULL,
-  `url` varchar(75) DEFAULT NULL,
-  `url2` varchar(75) DEFAULT NULL,
+  `url` varchar(250) DEFAULT NULL,
+  `url2` varchar(250) DEFAULT NULL,
   PRIMARY KEY (`tavid`),
   CONSTRAINT `header_ibfk_1` FOREIGN KEY (`tavid`) REFERENCES `login` (`tavid`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
