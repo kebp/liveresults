@@ -7,7 +7,7 @@
         // ReSharper disable once InconsistentNaming
         public static VERSION : string = "2023-06-02";
         private updateAutomatically: boolean = true;
-        private updateInterval: number = 10000;
+        private updateInterval: number = 60000;
         private classUpdateInterval: number = 60000;
 
         private classUpdateTimer : any = null;
@@ -995,7 +995,7 @@
         }
         public resetSorting() {
             var idxCol = 0;
-            $.each(this.currentTable.fnSettings().aoColumns, (idx, val) => {
+            $.each(this.currentTable.fnSettings().aoColumns, (idx : number, val) => {
                 if (val.sTitle == "VP") {
                     idxCol = idx;
                 }

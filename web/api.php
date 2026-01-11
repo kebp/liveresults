@@ -28,7 +28,7 @@ $RunnerStatus = [
 
 header('content-type: application/json; charset=' . $CHARSET);
 header('Access-Control-Allow-Origin: *');
-header('cache-control: max-age=10');
+header('cache-control: max-age=60');
 header('pragma: public');
 header('Expires: ' . gmdate('D, d M Y H:i:s \G\M\T', time() + 10));
 
