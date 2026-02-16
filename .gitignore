@@ -182,3 +182,7 @@ UpgradeLog*.htm
 FakesAssemblies/
 /LiveResults.Client/bin - Copy/Debug - Copy
 /LiveResults.Client/bin - Copy/DebugOE
+
+# KR additions
+.vs/*
+*/.vs/
