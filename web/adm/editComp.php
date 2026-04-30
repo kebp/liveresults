@@ -19,8 +19,8 @@ if (isset($_POST['btnSave'])) {
         $_POST['name'],
         $_POST['org'],
         $_POST['date'],
-        (bool) (isset($_POST['tenths']) ? 0 : 1),
-        (bool) (isset($_POST['public']) ? 0 : 1),
+        (bool) (isset($_POST['tenths']) ? 1 : 0),
+        (bool) (isset($_POST['public']) ? 1 : 0),
         (int) $_POST['timediff'],
     );
     isset($_POST['public']) ? ($comp['public'] = '1') : ($comp['public'] = '0');
@@ -52,10 +52,8 @@ if (isset($_GET['what'])) {
                 $_POST['background'],
                 $_POST['url'],
                 $_POST['url2'],
+                $_POST['logo'],
             );
-            break;
-        case 'logo':
-            Emma::UploadLogo((int) $_GET['compid'], $_FILES['fileToUpload']);
             break;
     }
 }
@@ -232,7 +230,7 @@ function confirmDelAllRadio() {
 </form>
 
 <br><h1 class="categoriesheader">Header markup</h1>
-<p>Header settings are all otional, but useful if you have majore event branding. Defaults are all sensible</p>
+<p>Header settings are all otional, but useful if you have major event branding. Defaults are all sensible</p>
 <form name="header" action="editComp.php?what=hdr&compid=<?= $comp['tavid'] ?>" method="post">
 <div>
   <b><label for="foreground">Foreground color</label></b>
@@ -250,23 +248,16 @@ function confirmDelAllRadio() {
   <input type="color" id="background" name="background" value="<?= $hdr['bg'] ?>" />
 </div>
 <div>
-  <b>Logo: </b><?= $hdr['logoname'] ?><br/>
-  <b><label for="url">URL for logo</label></b>
-  <input type="url" name="url" size="35" value="<?= $hdr['url'] ?>" /><br/>
+  <b><label for="url">Logo image URL</label></b>
+  <input type="url" name="logo" size="50" value="<?= $hdr['logo'] ?>" /><br/>
+  <b><label for="url">URL for logo link</label></b>
+  <input type="url" name="url" size="50" value="<?= $hdr['url'] ?>" /><br/>
   <b><label for="url">URL for menu Home</label></b>
-  <input type="url2" name="url2" size="35" value="<?= $hdr['url2'] ?>" /><br/>
+  <input type="url2" name="url2" size="50" value="<?= $hdr['url2'] ?>" /><br/>
   <input type="submit" name="btnHdr" class="btn btn-primary" value="Save"/>
 </div>
 </form>
 </br>
-<p>Optionally upload an event or club logo for the event.
-Should be in SVG format and &lt; 50k in size.</p>
-<form action="editComp.php?what=logo&compid=<?= $comp['tavid'] ?>" method="post" enctype="multipart/form-data">
-  <b><label for="fileToUpload">Select image to upload</label></b>
-  <input type="file" name="fileToUpload" id="fileToUpload"></br>
-  <input type="submit" value="Upload Logo" name="btnLogo"  class="btn btn-primary">
-</form>
-
 <!-- Event deletion functions -->
 <hr/><h1 class="categoriesheader">Deletion</h1>
 <p class="fw-bolder text-danger fs-5" >Ensure that Emma uploads are paused / halted before using the delete functions.</p>

@@ -13,6 +13,8 @@ a.navbar-brand img {
   min-width: 120px;
   height: auto;
   aspect-ratio: 10 / 4;
+  border: none;
+  object-fit: contain;
 }
 
 /* html documents within iframes */

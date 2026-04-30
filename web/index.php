@@ -59,7 +59,7 @@ el.style.backgroundColor = "";
 <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #0f2170;">
   <div class="container-fluid">
   <a class="navbar-brand" href="https://liveoresults.org.uk/index.php">
-  <img src="logos/liveoresults.svg" alt="LiveResults logo" width="200" height="60" class="d-inline-block align-text-top">
+  <img src="/logos/liveoresults.svg" alt="LiveResults logo" width="200" height="60" class="d-inline-block align-text-top">
   </a>
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">

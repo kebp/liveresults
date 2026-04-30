@@ -196,7 +196,7 @@ $(document).ready(function()
 <nav class="navbar navbar-expand-lg <?= $header['fg'] ?>" style="background-color: <?= $header['bg'] ?>;">
   <div class="container-fluid">
   <a class="navbar-brand" href="<?= $header['url'] ?>">
-  <img src="logos/<?= $header['logo'] ?>" alt="Event logo" width="200" height="60" class="d-inline-block align-text-top">
+  <img src="<?= $header['logo'] ?>" alt="Event logo" width="200" height="60" class="d-inline-block align-text-top">
   </a>
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
