@@ -155,7 +155,7 @@ class Emma
             . ",'"
             . md5($name . $org . $date)
             . "','"
-            . md5('liveresultat')
+            . strtoupper(bin2hex(random_bytes(6)))
             . "','"
             . $name
             . "','"
@@ -276,7 +276,7 @@ class Emma
 
         $result = mysqli_query(
             $conn,
-            "select compName, compDate,tavid,organizer,public,tenths,timediff, timezone, multidaystage,multidayparent from login where tavid={$compid}",
+            "select compName, compDate,tavid,pass,organizer,public,tenths,timediff, timezone, multidaystage,multidayparent from login where tavid={$compid}",
         );
 
         $ret = null;

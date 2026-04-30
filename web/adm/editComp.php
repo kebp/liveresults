@@ -211,8 +211,10 @@ function confirmDelAllRadio() {
 
 <form name="form1" action="editComp.php?what=comp&compid=<?= $comp['tavid'] ?>" method="post">
 <h1 class="categoriesheader">Edit competition</h1>
-<b>CompetitionID</b><br/>
-<input type="text" name="id" size="35" disabled="true" value="<?= $comp['tavid'] ?>"/><br/>
+<table>
+<tr><td><b>CompetitionID</b></td><td><b>Competition key</b></td></tr>
+<tr><td><input type="text" name="id" size="35" disabled="true" value="<?= $comp['tavid'] ?>"/></td><td><input type="text" name="key" size="35" disabled="true" value="<?= $comp['pass'] ?>"/></td></tr>
+</table>
 <b>Competitions Name</b><br/>
 <input type="text" name="name" size="35" value="<?= $comp['compName'] ?>"/><br/>
 <b>Organizer</b><br/>
@@ -230,7 +232,7 @@ function confirmDelAllRadio() {
 </form>
 
 <br><h1 class="categoriesheader">Header markup</h1>
-<p>Header settings are all otional, but useful if you have major event branding. Defaults are all sensible</p>
+<p>Header settings are all optional, but useful if you have major event branding. Defaults are all sensible</p>
 <form name="header" action="editComp.php?what=hdr&compid=<?= $comp['tavid'] ?>" method="post">
 <div>
   <b><label for="foreground">Foreground color</label></b>
