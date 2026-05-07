@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 date_default_timezone_set('Europe/London');
@@ -28,9 +29,9 @@ $RunnerStatus = [
 
 header('content-type: application/json; charset=' . $CHARSET);
 header('Access-Control-Allow-Origin: *');
-header('cache-control: max-age=60');
 header('pragma: public');
-header('Expires: ' . gmdate('D, d M Y H:i:s \G\M\T', time() + 10));
+//header('cache-control: max-age=60');
+//header('Expires: ' . gmdate('D, d M Y H:i:s \G\M\T', time() + 10));
 
 if (!isset($_GET['method'])) {
     $_GET['method'] = null;
@@ -41,6 +42,7 @@ $br = $pretty ? "\n" : '';
 ///Method returns all competitions available
 switch ($_GET['method']) {
     case 'getcompetition':
+        header('cache-control: max-age=60');
         $comps = Emma::GetCompetitions();
         echo "{ \"competitions\": [{$br}";
         $first = true;
@@ -49,24 +51,21 @@ switch ($_GET['method']) {
                 echo ',';
             }
             echo
-                "{\"id\": "
-                . $comp['tavid']
-                    . ", \"name\": \""
+                '{"id": '
+                    . $comp['tavid']
+                    . ', "name": "'
                     . $comp['compName']
-                    . "\", \"organizer\": \""
+                    . '", "organizer": "'
                     . $comp['organizer']
-                    . "\", \"date\": \""
+                    . '", "date": "'
                     . date('Y-m-d', strtotime($comp['compDate']))
-                    . "\""
+                    . '"'
             ;
 
-            echo ", \"timediff\": " . $comp['timediff'];
+            echo ', "timediff": ' . $comp['timediff'];
             if ($comp['multidaystage'] !== '') {
                 echo
-                    ", \"multidaystage\": "
-                    . $comp['multidaystage']
-                        . ", \"multidayfirstday\": "
-                        . $comp['multidayparent']
+                    ', "multidaystage": ' . $comp['multidaystage'] . ', "multidayfirstday": ' . $comp['multidayparent']
                 ;
             }
 
@@ -75,89 +74,40 @@ switch ($_GET['method']) {
         }
         echo ']';
         break;
-    case 'setcompetitioninfo':
-        $compid = $_POST['comp'];
-        Emma::UpdateCompetition(
-            $compid,
-            $_POST['compName'],
-            $_POST['organizer'],
-            $_POST['date'],
-            $_POST['public'],
-            $_POST['timediff'],
-        );
-        echo "{\"status\": \"OK\"";
-        break;
-    case 'createcompetition':
-        $data = json_decode($HTTP_RAW_POST_DATA);
-        if (!isset($data->name)) {
-            echo "{\"status\": \"Error\", \"message\": \"name not set\"}";
-        }
-        if (!isset($data->organizer)) {
-            echo "{\"status\": \"Error\", \"message\": \"organizer not set\"}";
-        }
-        if (!isset($data->date)) {
-            echo "{\"status\": \"Error\", \"message\": \"date not set\"}";
-        }
-        if (!isset($data->country)) {
-            echo "{\"status\": \"Error\", \"message\": \"country not set\"}";
-        }
-        if (!isset($data->email)) {
-            echo "{\"status\": \"Error\", \"message\": \"email not set\"}";
-        }
-        if (!isset($data->password)) {
-            echo "{\"status\": \"Error\", \"message\": \"password not set\"}";
-        }
-
-        $id = Emma::CreateCompetitionFull(
-            $data->name,
-            $data->organizer,
-            $data->date,
-            $data->email,
-            $data->password,
-            $data->country,
-        );
-
-        if ($id > 0) {
-            echo "{\"status\": \"OK\", \"competitionid\": " . $id . ' }';
-        } else {
-            echo "{\"status\": \"Error\", \"message\": \"Error adding competition\" }";
-        }
-        break;
     case 'getcompetitioninfo':
         $compid = $_GET['comp'];
-        $comp = Emma::GetCompetition($compid);
+        $comp = Emma::GetCompetition(intval($compid));
+        set_cache_header(filter_var($comp['sprint'], FILTER_VALIDATE_BOOLEAN));
         if (isset($comp['tavid'])) {
             echo
-                "{\"id\": "
-                . $comp['tavid']
-                    . ", \"name\": \""
+                '{"id": '
+                    . $comp['tavid']
+                    . ', "name": "'
                     . $comp['compName']
-                    . "\", \"organizer\": \""
+                    . '", "organizer": "'
                     . $comp['organizer']
-                    . "\", \"date\": \""
+                    . '", "date": "'
                     . date('Y-m-d', strtotime($comp['compDate']))
-                    . "\""
+                    . '"'
             ;
 
-            echo ", \"timediff\": " . $comp['timediff'];
-            echo ", \"timezone\": \"" . $comp['timezone'] . "\"";
-            echo ", \"isPublic\": " . (isset($comp['public']) ? $comp['public'] : false);
+            echo ', "timediff": ' . $comp['timediff'];
+            echo ', "timezone": "' . $comp['timezone'] . '"';
+            echo ', "isPublic": ' . (isset($comp['public']) ? $comp['public'] : false);
             if ($comp['multidaystage'] !== '') {
                 echo
-                    ", \"multidaystage\": "
-                    . $comp['multidaystage']
-                        . ", \"multidayfirstday\": "
-                        . $comp['multidayparent']
+                    ', "multidaystage": ' . $comp['multidaystage'] . ', "multidayfirstday": ' . $comp['multidayparent']
                 ;
             }
 
             echo '}';
         } else {
-            echo "{\"id\": " . filter_input(INPUT_GET, 'compid', FILTER_SANITIZE_NUMBER_INT) . '}';
+            echo '{"id": ' . filter_input(INPUT_GET, 'compid', FILTER_SANITIZE_NUMBER_INT) . '}';
         }
         break;
     case 'getlastpassings':
         $currentComp = new Emma((int) $_GET['comp']);
+        set_cache_header(filter_var($currentComp->IsSprint(), FILTER_VALIDATE_BOOLEAN));
         $lastPassings = $currentComp->getLastPassings(7);
 
         $first = true;
@@ -169,36 +119,37 @@ switch ($_GET['method']) {
             $dt = new DateTime($pass['Changed'], new DateTimeZone('UTC'));
             $dt->setTimeZone(new DateTimeZone('Europe/London'));
             $ret .=
-                "{\"passtime\": \""
+                '{"passtime": "'
                 . $dt->format('G:i:s')
-                . "\",
-					\"runnerName\": \""
+                . '",
+					"runnerName": "'
                 . $pass['Name']
-                . "\",
-					\"class\": \""
+                . '",
+					"class": "'
                 . $pass['class']
-                . "\",
-					\"control\": "
+                . '",
+					"control": '
                 . $pass['Control']
-                . ",
-					\"controlName\" : \""
+                . ',
+					"controlName" : "'
                 . $pass['pname']
-                . "\",
-					\"time\": \""
+                . '",
+					"time": "'
                 . format_time($pass['Time'], $pass['Status'], $RunnerStatus)
-                . "\" }";
+                . '" }';
             $first = false;
         }
 
         $hash = MD5($ret);
         if (isset($_GET['last_hash']) && $_GET['last_hash'] === $hash) {
-            echo "{ \"status\": \"NOT MODIFIED\"}";
+            echo '{ "status": "NOT MODIFIED"}';
         } else {
             echo "{ \"status\": \"OK\", {$br}\"passings\" : [{$br}{$ret}{$br}],{$br} \"hash\": \"{$hash}\"}";
         }
         break;
     case 'getclasses':
         $currentComp = new Emma((int) $_GET['comp']);
+        set_cache_header(filter_var($currentComp->IsSprint(), FILTER_VALIDATE_BOOLEAN));
         $classes = $currentComp->Classes();
         $ret = '';
         $first = true;
@@ -207,21 +158,22 @@ switch ($_GET['method']) {
             if (!$first) {
                 $ret .= ",{$br}";
             }
-            $ret .= "{\"className\": \"" . $class['Class'] . "\"}";
+            $ret .= '{"className": "' . $class['Class'] . '"}';
             $first = false;
         }
 
         $hash = MD5($ret);
 
         if (isset($_GET['last_hash']) && $_GET['last_hash'] === $hash) {
-            echo "{ \"status\": \"NOT MODIFIED\"}";
+            echo '{ "status": "NOT MODIFIED"}';
         } else {
             echo "{ \"status\": \"OK\", \"classes\" : [{$br}{$ret}{$br}]";
-            echo ",{$br} \"hash\": \"" . $hash . "\"}";
+            echo ",{$br} \"hash\": \"" . $hash . '"}';
         }
         break;
     case 'getclubresults':
         $currentComp = new Emma((int) $_GET['comp']);
+        set_cache_header(filter_var($currentComp->IsSprint(), FILTER_VALIDATE_BOOLEAN));
         $club = $_GET['club'];
         $results = $currentComp->getClubResults((int) $_GET['comp'], $club);
         $ret = '';
@@ -264,13 +216,13 @@ switch ($_GET['method']) {
             $ret .=
                 "{\"place\": \"{$cp}\", \"name\": \""
                 . $res['Name']
-                . "\", \"club\": \""
+                . '", "club": "'
                 . $res['Club']
-                . "\",\"class\": \""
+                . '","class": "'
                 . $res['Class']
-                . "\", \"result\": \""
+                . '", "result": "'
                 . $time
-                . "\",\"status\" : "
+                . '","status" : '
                 . $status
                 . ", \"timeplus\": \"{$timeplus}\"";
 
@@ -291,14 +243,15 @@ switch ($_GET['method']) {
 
         $hash = MD5($ret);
         if (isset($_GET['last_hash']) && $_GET['last_hash'] === $hash) {
-            echo "{ \"status\": \"NOT MODIFIED\"}";
+            echo '{ "status": "NOT MODIFIED"}';
         } else {
             echo "{ \"status\": \"OK\",{$br} \"clubName\": \"" . $club . "\", {$br}\"results\": [{$br}{$ret}{$br}]";
-            echo ", {$br} \"hash\": \"" . $hash . "\"}";
+            echo ", {$br} \"hash\": \"" . $hash . '"}';
         }
         break;
     case 'getsplitcontrols':
-        $currentComp = new Emma($_GET['comp']);
+        $currentComp = new Emma((int) $_GET['comp']);
+        set_cache_header(filter_var($currentComp->IsSprint(), FILTER_VALIDATE_BOOLEAN));
         $splits = $currentComp->getAllSplitControls();
         $splitJSON = "[{$br}";
         $first = true;
@@ -307,29 +260,30 @@ switch ($_GET['method']) {
                 $splitJSON .= ",{$br}";
             }
             $splitJSON .=
-                "{ \"class\": "
+                '{ "class": '
                 . $split['className']
-                . ", \"code\": "
+                . ', "code": '
                 . $split['code']
-                . ", \"name\": \""
+                . ', "name": "'
                 . $split['name']
-                . "\", \"order\": \""
+                . '", "order": "'
                 . $split['corder']
-                . "\"}";
+                . '"}';
             $first = false;
         }
         $splitJSON .= "{$br}]";
         $hash = MD5($splitJSON);
         if (isset($_GET['last_hash']) && $_GET['last_hash'] === $hash) {
-            echo "{ \"status\": \"NOT MODIFIED\"}";
+            echo '{ "status": "NOT MODIFIED"}';
         } else {
             echo "{ \"status\": \"OK\",{$br} \"splitcontrols\": {$splitJSON}";
-            echo ",{$br} \"hash\": \"" . $hash . "\"}";
+            echo ",{$br} \"hash\": \"" . $hash . '"}';
         }
         break;
     case 'getclassresults':
         $class = rawurldecode($_GET['class']);
         $currentComp = new Emma((int) $_GET['comp']);
+        set_cache_header(filter_var($currentComp->IsSprint(), FILTER_VALIDATE_BOOLEAN));
         $results = $currentComp->getAllSplitsForClass($class);
         $splits = $currentComp->getSplitControlsForClass($class);
 
@@ -370,7 +324,7 @@ switch ($_GET['method']) {
             if (!$first) {
                 $splitJSON .= ",{$br}";
             }
-            $splitJSON .= "{ \"code\": " . $split['code'] . ", \"name\": \"" . $split['name'] . "\"}";
+            $splitJSON .= '{ "code": ' . $split['code'] . ', "name": "' . $split['name'] . '"}';
             $first = false;
             usort($results, function ($a, $b) use ($split) {
                 if (!isset($a[$split['code'] . '_time']) && isset($b[$split['code'] . '_time'])) {
@@ -425,7 +379,7 @@ switch ($_GET['method']) {
                         $cursplittime = $res[$split['code'] . '_time'];
                     }
                 } else {
-                    $results[$key][$split['code'] . '_place'] = "\"-\"";
+                    $results[$key][$split['code'] . '_place'] = '"-"';
                 }
             }
         }
@@ -498,13 +452,13 @@ switch ($_GET['method']) {
             $tot = '';
             if ($retTotal) {
                 $tot =
-                    ", \"totalresult\": "
+                    ', "totalresult": '
                     . $res['totaltime']
-                    . ", \"totalstatus\": "
+                    . ', "totalstatus": '
                     . $res['totalstatus']
-                    . ", \"totalplace\": \""
+                    . ', "totalplace": "'
                     . $res['totalplace']
-                    . "\", \"totalplus\": "
+                    . '", "totalplus": '
                     . $res['totalplus'];
             }
 
@@ -513,7 +467,7 @@ switch ($_GET['method']) {
                     "[\"{$cp}\", \""
                     . $res['Name']
                     . "\",{$br} \""
-                    . str_replace("\"", "'", $res['Club'])
+                    . str_replace('"', "'", $res['Club'])
                     . "\",{$br} "
                     . $res['Time']
                     . ",{$br} "
@@ -526,7 +480,7 @@ switch ($_GET['method']) {
                     "{\"place\": \"{$cp}\",{$br} \"name\": \""
                     . $res['Name']
                     . "\",{$br} \"club\": \""
-                    . str_replace("\"", "'", $res['Club'])
+                    . str_replace('"', "'", $res['Club'])
                     . "\",{$br} \"result\": \""
                     . $time
                     . "\",{$br} \"status\" : "
@@ -547,21 +501,21 @@ switch ($_GET['method']) {
                             }
 
                             $ret .=
-                                "\""
+                                '"'
                                 . $split['code']
-                                . "\": "
+                                . '": '
                                 . $res[$split['code'] . '_time']
-                                . ",\""
+                                . ',"'
                                 . $split['code']
-                                . "_status\": "
+                                . '_status": '
                                 . $splitStatus
-                                . ",\""
+                                . ',"'
                                 . $split['code']
-                                . "_place\": "
+                                . '_place": '
                                 . $res[$split['code'] . '_place']
-                                . ",\""
+                                . ',"'
                                 . $split['code']
-                                . "_timeplus\": "
+                                . '_timeplus": '
                                 . $res[$split['code'] . '_timeplus'];
                             $spage = time() - strtotime($res[$split['code'] . '_changed']);
                             if ($spage < 120) {
@@ -569,13 +523,13 @@ switch ($_GET['method']) {
                             }
                         } else {
                             $ret .=
-                                "\""
+                                '"'
                                 . $split['code']
-                                . "\": \"\",\""
+                                . '": "","'
                                 . $split['code']
-                                . "_status\": 1,\""
+                                . '_status": 1,"'
                                 . $split['code']
-                                . "_place\": \"\"";
+                                . '_place": ""';
                         }
 
                         $firstspl = false;
@@ -610,7 +564,7 @@ switch ($_GET['method']) {
 
         $hash = MD5($ret);
         if (isset($_GET['last_hash']) && $_GET['last_hash'] === $hash) {
-            echo "{ \"status\": \"NOT MODIFIED\"}";
+            echo '{ "status": "NOT MODIFIED"}';
         } else {
             echo
                 "{ \"status\": \"OK\",{$br} \"className\": \""
@@ -618,7 +572,7 @@ switch ($_GET['method']) {
                     . "\",{$br} \"splitcontrols\": {$splitJSON},{$br} \"results\": [{$br}{$ret}{$br}]"
             ;
 
-            echo ",{$br} \"hash\": \"" . $hash . "\"}";
+            echo ",{$br} \"hash\": \"" . $hash . '"}';
         }
         ;
         break;
@@ -626,7 +580,7 @@ switch ($_GET['method']) {
         $protocol = isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0';
         header($protocol . ' ' . (400) . ' Bad Request');
 
-        echo "{ \"status\": \"ERR\", \"message\": \"No method given\"}";
+        echo '{ "status": "ERR", "message": "No method given"}';
         break;
 }
 
@@ -722,4 +676,13 @@ function url_raw_decode(string $raw_url_encoded)
 
     // Return decoded  raw url encoded data
     return rawurldecode($raw_url_encoded);
+}
+
+function set_cache_header(bool $isSprint)
+{
+    if ($isSprint) {
+        header('cache-control: max-age=10');
+    } else {
+        header('cache-control: max-age=60');
+    }
 }

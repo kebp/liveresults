@@ -3,7 +3,7 @@ var LiveResults;
     // ReSharper disable once InconsistentNaming
     LiveResults.Instance = null;
     var AjaxViewer = /** @class */ (function () {
-        function AjaxViewer(competitionId, language, classesDiv, lastPassingsDiv, resultsHeaderDiv, resultsControlsDiv, resultsDiv, txtResetSorting, resources, isMultiDayEvent, isSingleClass, setAutomaticUpdateText, runnerStatus, showTenthOfSecond) {
+        function AjaxViewer(competitionId, language, classesDiv, lastPassingsDiv, resultsHeaderDiv, resultsControlsDiv, resultsDiv, txtResetSorting, resources, isMultiDayEvent, isSingleClass, setAutomaticUpdateText, runnerStatus, showTenthOfSecond, updateInterval) {
             var _this = this;
             this.competitionId = competitionId;
             this.language = language;
@@ -19,8 +19,9 @@ var LiveResults;
             this.setAutomaticUpdateText = setAutomaticUpdateText;
             this.runnerStatus = runnerStatus;
             this.showTenthOfSecond = showTenthOfSecond;
+            this.updateInterval = updateInterval;
             this.updateAutomatically = true;
-            this.updateInterval = 60000;
+            //        private updateInterval: number = 60000;
             this.classUpdateInterval = 60000;
             this.classUpdateTimer = null;
             this.passingsUpdateTimer = null;
@@ -151,6 +152,9 @@ var LiveResults;
         //Set wether to display tenthofasecond in results
         AjaxViewer.prototype.setShowTenth = function (val) {
             this.showTenthOfSecond = val;
+        };
+        AjaxViewer.prototype.setUpdateInterval = function (val) {
+            this.updateInterval = val;
         };
         //Request data for the last-passings div
         AjaxViewer.prototype.updateLastPassings = function () {

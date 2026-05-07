@@ -17,6 +17,7 @@ class Emma
     var string $m_CompDate;
     var int $m_TimeDiff = 0;
     var bool $m_Tenths = false;
+    var bool $m_Sprint = false;
     var bool $m_IsMultiDayEvent = false;
     var int $m_MultiDayStage = -1;
     var int $m_MultiDayParent = -1;
@@ -237,6 +238,7 @@ class Emma
         string $date,
         bool $tenths,
         bool $public,
+        bool $sprint,
         int $timediff,
     ): void {
         $conn = self::openConnection();
@@ -245,6 +247,8 @@ class Emma
             . ($tenths ? '1' : '0')
             . ', public='
             . ($public ? '1' : '0')
+            . ', sprint='
+            . ($sprint ? '1' : '0')
             . " where tavid={$id}";
 
         mysqli_query($conn, $sql) or die(mysqli_error($conn));
@@ -276,7 +280,7 @@ class Emma
 
         $result = mysqli_query(
             $conn,
-            "select compName, compDate,tavid,pass,organizer,public,tenths,timediff, timezone, multidaystage,multidayparent from login where tavid={$compid}",
+            "select compName, compDate,tavid,pass,organizer,public,tenths,sprint,timediff,timezone, multidaystage,multidayparent from login where tavid={$compid}",
         );
 
         $ret = null;
@@ -327,6 +331,8 @@ class Emma
 
             $this->m_Tenths = (bool) $tmp['tenths'];
 
+            $this->m_Sprint = (bool) $tmp['sprint'];
+
             if (isset($tmp['multidaystage'])) {
                 if ($tmp['multidaystage'] !== null && $tmp['multidayparent'] !== null && $tmp['multidaystage'] > 1) {
                     $this->m_IsMultiDayEvent = true;
@@ -345,6 +351,11 @@ class Emma
     function IsTenths(): bool
     {
         return $this->m_Tenths;
+    }
+
+    function IsSprint(): bool
+    {
+        return $this->m_Sprint;
     }
 
     function CompName(): string

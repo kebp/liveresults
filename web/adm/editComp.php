@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 include_once '../templates/classEmma.class.php';
@@ -21,10 +22,12 @@ if (isset($_POST['btnSave'])) {
         $_POST['date'],
         (bool) (isset($_POST['tenths']) ? 1 : 0),
         (bool) (isset($_POST['public']) ? 1 : 0),
+        (bool) (isset($_POST['sprint']) ? 1 : 0),
         (int) $_POST['timediff'],
     );
     isset($_POST['public']) ? ($comp['public'] = '1') : ($comp['public'] = '0');
     isset($_POST['tenths']) ? ($comp['tenths'] = '1') : ($comp['tenths'] = '0');
+    isset($_POST['sprint']) ? ($comp['sprint'] = '1') : ($comp['sprint'] = '0');
 }
 
 if (isset($_POST['btnAdd'])) {
@@ -220,14 +223,19 @@ function confirmDelAllRadio() {
 <b>Organizer</b><br/>
 <input type="text" name="org" size="35" value="<?= $comp['organizer'] ?>"/><br/>
 <b>Date (format yyyy-mm-dd)</b><br/>
-<input type="text" name="date" size="35" value="<?= date('Y-m-d', strtotime($comp['compDate'])) ?>"/> (ex. 2008-02-03)<br/>
+<input type="text" name="date" size="35" value="<?= date(
+    'Y-m-d',
+    strtotime($comp['compDate']),
+) ?>"/> (ex. 2008-02-03)<br/>
 <b>Timezonediff (hours: 0 for GMT / BST, 1 for  CET / CEST)</b><br/>
 <input type="text" name="timediff" size="10" value="<?= $comp['timediff'] ?>"/><br/>
 
 <b>Public</b>
 <input type="checkbox" name="public" <?= $comp['public'] === '1' ? 'checked' : '' ?>/><br/>
 <b>Show tenths second</b>
-<input type="checkbox" name="tenths" <?= $comp['tenths'] === '1' ? 'checked' : '' ?>/><br/><br/>
+<input type="checkbox" name="tenths" <?= $comp['tenths'] === '1' ? 'checked' : '' ?>/><br/>
+<b>Sprint event</b>
+<input type="checkbox" name="sprint" <?= $comp['sprint'] === '1' ? 'checked' : '' ?>/><br/><br/>
 <input type="submit" name="btnSave" class="btn btn-primary" value="Save"/>
 </form>
 
@@ -281,12 +289,13 @@ function confirmDelAllRadio() {
 <table border="0">
 <tr><td><b>Code</td><td><b>Name</td><td><b>Class</td><td><b>Order</td></tr>
 <?php
+
 $rcontrols = Emma::GetRadioControls(intval($_GET['compid']));
 $id = filter_input(INPUT_GET, 'compid', FILTER_SANITIZE_NUMBER_INT);
 for ($i = 0; $i < count($rcontrols); $i++) {
     echo
         '<tr><td>'
-        . $rcontrols[$i]['code']
+            . $rcontrols[$i]['code']
             . '</td><td>'
             . $rcontrols[$i]['name']
             . '</td><td>'

@@ -8,6 +8,7 @@ CREATE TABLE `login` (
   `organizer` varchar(50) DEFAULT NULL,
   `timediff` int(11) NOT NULL DEFAULT 0,
   `tenths` tinyint(1) NOT NULL DEFAULT 0,
+  `sprint` tinyint(1) NOT NULL DEFAULT 0,
   `multidaystage` int(11) DEFAULT NULL,
   `multidayparent` int(11) DEFAULT NULL,
   `timezone` varchar(10) DEFAULT NULL,

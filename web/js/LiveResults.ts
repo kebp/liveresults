@@ -7,7 +7,7 @@
         // ReSharper disable once InconsistentNaming
         public static VERSION : string = "2023-06-02";
         private updateAutomatically: boolean = true;
-        private updateInterval: number = 60000;
+//        private updateInterval: number = 60000;
         private classUpdateInterval: number = 60000;
 
         private classUpdateTimer : any = null;
@@ -35,7 +35,7 @@
             private resultsHeaderDiv: HTMLDivElement, private resultsControlsDiv: HTMLDivElement, private resultsDiv: HTMLDivElement,
             private txtResetSorting: HTMLDivElement,
             private resources: any, private isMultiDayEvent: boolean, private isSingleClass: boolean, private setAutomaticUpdateText: HTMLDivElement,
-            private runnerStatus: any, private showTenthOfSecond: boolean) {
+            private runnerStatus: any, private showTenthOfSecond: boolean, private updateInterval: number) {
             LiveResults.Instance = this;
 
             (<any>$(window)).hashchange(() => {
@@ -163,6 +163,10 @@
         //Set wether to display tenthofasecond in results
         public setShowTenth(val: boolean) {
             this.showTenthOfSecond = val;
+        }
+
+        public setUpdateInterval(val: number) {
+            this.updateInterval = val;
         }
 
         //Request data for the last-passings div
