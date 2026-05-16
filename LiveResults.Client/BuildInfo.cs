@@ -14,7 +14,7 @@ namespace LiveResults.Client
 {
     public static class BuildInfo
     {
-        private const long              BUILD_DATE_BINARY_UTC       = 0x48dcae5f1d3db488;    // July 27, 2024 5:11:11.547712 PM UTC
+        private const long              BUILD_DATE_BINARY_UTC       = 0x48de68eb839124c1;    // February 10, 2026 9:29:46.711980 PM UTC
 
         private static AssemblyName     BuildAssemblyName { get; }  = Assembly.GetExecutingAssembly().GetName();
         public static DateTimeOffset    BuildDateUtc { get; }       = DateTime.FromBinary(BUILD_DATE_BINARY_UTC);
@@ -25,7 +25,7 @@ namespace LiveResults.Client
 #endif
                                                                                 ;
 
-        public static string            BuildDateText { get; }      = "27 July 2024 17:11:11 UTC";
+        public static string            BuildDateText { get; }      = "10 February 2026 21:29:46 UTC";
         public static string            DisplayText { get; }        = $"{ModuleText} {VersionText} (Build Date: {BuildDateText})";
     }
 }

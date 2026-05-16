@@ -2,6 +2,7 @@
 using Microsoft.VisualBasic.FileIO;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Globalization;
 using System.IO;
 using System.Xml;
@@ -10,6 +11,9 @@ using System.Xml;
 //  K.Roberts   KR  May 2023    Added split time controls name definition embedded in comment. 
 //  K.Roberts   KR  Jul 2023    Parsed <Nationality> into club and parsed <BibNumber> into bib
 //                              N.B. Only added for when parsing results; TODO for parsing start lists 
+//  K.Roberts   KR  Dec 2025    Updating for more general use post WOC2025:
+//                              - ensure bib is not null if not supplied
+//                              - use configuration option to determine where club is populated from
 
 namespace LiveResults.Client.Parsers
 {
@@ -165,7 +169,7 @@ namespace LiveResults.Client.Parsers
                                 {
                                     string leg = legNode.InnerText;
 
-                                    string bib = null;                                                                          // KR
+                                    string bib = string.Empty;                                                                  // KR
                                     var bibNumberNode = teamMemberResult.SelectSingleNode("iof:Result/iof:BibNumber", nsMgr);   // KR
                                     if (bibNumberNode != null) bib = bibNumberNode.InnerText;                                   // KR
 
@@ -209,7 +213,7 @@ namespace LiveResults.Client.Parsers
                         string club;
                         if (!ParseNameClubAndId(personNode, nsMgr, out familyname, out givenname, out club)) continue;
 
-                        string bib = null;                                                                      // KR
+                        string bib = string.Empty;                                                              // KR
                         var bibNumberNode = personNode.SelectSingleNode("iof:Result/iof:BibNumber", nsMgr);     // KR
                         if (bibNumberNode != null) bib = bibNumberNode.InnerText;                               // KR
 
@@ -491,14 +495,36 @@ namespace LiveResults.Client.Parsers
             givenname = giveNameNode.InnerText;
             // sourceId = personIdNode.InnerText;
 
-            //var clubNode = personResultNode.SelectSingleNode("iof:Organisation/iof:ShortName",nsMgr); // KR
-            var clubNode = personResultNode.SelectSingleNode("iof:Person/iof:Nationality", nsMgr);      // KR use nationality for club
-            club = "";
-            if (clubNode != null)
+            // parse club from either club or nationality depending on app config setting - KR December 2025
+
+            club = string.Empty;
+            var parseClubFrom = ConfigurationManager.AppSettings["club"].ToLower();
+            if (parseClubFrom.Equals("club"))
             {
-                //club = clubNode.InnerText;                                                            // KR
-                if (clubNode.Attributes["code"] != null) club = clubNode.Attributes["code"].Value;      // KR                                              // KR
+                var clubNode = personResultNode.SelectSingleNode("iof:Organisation/iof:ShortName", nsMgr);
+                if (clubNode != null)
+                {
+                    club = clubNode.InnerText; 
+                }
             }
+            else if (parseClubFrom.Equals("nationality"))
+            {
+                var clubNode = personResultNode.SelectSingleNode("iof:Person/iof:Nationality", nsMgr); 
+                if (clubNode != null)
+                {
+                    if (clubNode.Attributes["code"] != null) club = clubNode.Attributes["code"].Value;                                           // KR
+                }
+            }
+
+            //var clubNode = personResultNode.SelectSingleNode("iof:Organisation/iof:ShortName",nsMgr); // KR
+            //var clubNode = personResultNode.SelectSingleNode("iof:Person/iof:Nationality", nsMgr);      // KR use nationality for club
+            //club = "";
+            //if (clubNode != null)
+            //{
+                //club = clubNode.InnerText;                                                            // KR
+            //    if (clubNode.Attributes["code"] != null) club = clubNode.Attributes["code"].Value;      // KR                                              // KR
+            //}
+
             return true;
         }
 

@@ -14,7 +14,8 @@
 
     try
     {
-        strNamespace = ((EnvDTE.Project)((Array)dte.ActiveSolutionProjects).GetValue(0)).Properties.Item("DefaultNamespace").Value.ToString();
+        //strNamespace = ((EnvDTE.Project)((Array)dte.ActiveSolutionProjects).GetValue(0)).Properties.Item("DefaultNamespace").Value.ToString();
+        strNamespace = "LiveResults.Client";    // For some reason(!), the above was returning an empty string. Hardcoded what it should be.
     }
     catch ( Exception /*e*/ )
     {
